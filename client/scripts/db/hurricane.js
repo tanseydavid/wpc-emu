@@ -18,7 +18,7 @@ module.exports = {
     { id: 16, name: 'TROUGH 1' },
     { id: 17, name: 'TROUGH 2' },
     { id: 18, name: 'TROUGH 3' },
-    
+
     { id: 21, name: 'SLAM TILT' },
     { id: 22, name: 'COIN DOOR CLOSED' },
     { id: 23, name: 'TICKED OPTQ' },
@@ -26,7 +26,7 @@ module.exports = {
     { id: 26, name: 'RIGHT RETURN' },
     { id: 27, name: 'RIGHT OUTLANE' },
     { id: 28, name: 'BALL SHOOTER' },
-    
+
     { id: 31, name: 'FERRIS WHEEL' },
     { id: 33, name: 'L DROP 1' },
     { id: 34, name: 'L DROP 2' },
@@ -34,19 +34,19 @@ module.exports = {
     { id: 36, name: 'LEFT SLING' },
     { id: 37, name: 'LEFT RETURN' },
     { id: 38, name: 'LEFT OUTLANE' },
-    
+
     { id: 42, name: 'RIGHT STANDUP 1' },
     { id: 43, name: 'RIGHT STANDUP 2' },
     { id: 44, name: 'RIGHT STANDUP 3' },
     { id: 45, name: 'RIGHT STANDUP 4' },
-    
+
     { id: 51, name: 'LEFT JET' },
     { id: 52, name: 'RIGHT JET' },
     { id: 53, name: 'BOTTOM JET' },
     { id: 55, name: 'DUNK THE DUMMY' },
     { id: 56, name: 'LEFT JUGGLER' },
     { id: 57, name: 'RIGHT JUGGLER' },
-    
+
     { id: 61, name: 'HURRICANE ENTRY' },
     { id: 62, name: 'HURRICANE EXIT' },
     { id: 63, name: 'COMET ENTRY' },
@@ -66,8 +66,54 @@ module.exports = {
     { id: 13, name: 'LEFT JET' },
     { id: 14, name: 'RIGHT JET' },
     { id: 15, name: 'BOTTOM JET' },
-    { id: 15, name: 'BOTTOM JET' },
+    ],
+  /*
+    name: user readable name
+    activateWithSwitchId: the state will be activated when this switch is triggered
+                          is this value is missing, the state will be active asap
+    leaveWithSolenoidId: switch to the next state when this solenoid is activated
+  */
+  stateMachine: [
+    {
+      name: 'INITIAL',
+      nextState: 'DRAIN',
+    },
+    {
+      name: 'DRAIN',
+      leaveWithSolenoidId: 9,
+      nextState: 'OUTHOLE',
+    },
+    {
+      name: 'OUTHOLE',
+      activateWithSwitchId: 15,
+      leaveWithSolenoidId: 9,
+    },
+    {
+      name: 'ATTRACTION',
+      activateWithSwitchId: 0,
+      leaveWithSolenoidId: 0,
+      solenoidTrigger: 0,
+    },
+    {
+      name: 'GAME_IN_PROGRESS',
+      solenoidTrigger: 0,
+    },
+    {
+      name: 'GAME_IN_PROGRESS',
+      solenoidTrigger: 0,
+    },
   ],
+  skipWmcRomCheck: true,
+  initialise: {
+    closedSwitches: [ 16, 17, 18, 22 ],
+    initialAction: [
+      {
+        delayMs: 1000,
+        source: 'cabinetInput',
+        value: 16
+      }
+    ],
+  },
   playfield: {
     //size must be 200x400, lamp positions according to image
     image: 'https://s3-eu-west-1.amazonaws.com/foo-temp/playfield-hurricane.jpg',
@@ -110,7 +156,7 @@ module.exports = {
 
       [{ x: 56, y: 167, color: 'GREEN' }],
       [{ x: 55, y: 150, color: 'GREEN' }],
-      [{ x: 56, y: 133, color: 'WHITE' }],  //MYSTERY
+      [{ x: 56, y: 133, color: 'WHITE' }], //MYSTERY
       [{ x: 62, y: 110, color: 'YELLOW' }], //JACKPOT
       [{ x: 90, y: 371, color: 'ORANGE' }], //#55, PLAY IT AGAIN
       [{ x: 31, y: 165, color: 'WHITE' }],
@@ -158,16 +204,5 @@ module.exports = {
       { id: 27, x: 116, y: 151, },
       { id: 28, x: 9, y: 241, },
     ],
-  },    
-  skipWmcRomCheck: true,
-  initialise: {
-    closedSwitches: [ 16, 17, 18, 22 ],
-    initialAction: [
-      {
-        delayMs: 1000,
-        source: 'cabinetInput',
-        value: 16
-      }
-    ],
-  }
+  },
 };
