@@ -11,6 +11,13 @@ const RULE_OUTHOLE = {
 
 const RULESET = [
   {
+    name: 'Initial State',
+    switchDownTimeMs: 0,
+    nextState: 'Drain',
+    transitionTimeMs: 0,
+    options: ['INSTANT_LEAVE_STATE'],
+  },
+  {
     name: 'Right Trough',
     switchDownTimeMs: 1,
     switchIdToTrigger: 17,

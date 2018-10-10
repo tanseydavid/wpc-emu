@@ -108,7 +108,7 @@ module.exports = {
     { id: 16, name: 'TROUGH CENTER' },
     { id: 17, name: 'TROUGH RIGHT' },
     { id: 18, name: 'OUTHOLE' },
-    
+
     { id: 21, name: 'SLAM TILT' },
     { id: 22, name: 'COIN DOOR CLOSED' },
     { id: 23, name: 'TICKED OPTQ' },
@@ -161,7 +161,7 @@ module.exports = {
   skipWmcRomCheck: true,
   initialise: {
     //OPTO Switches: 23
-    closedSwitches: [ 15, 16, 17, 23 ],
+    closedSwitches: [ 23 ],
     initialAction: [
       {
         delayMs: 1000,
