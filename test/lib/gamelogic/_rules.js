@@ -1,6 +1,6 @@
 'use strict';
 
-const RULE_OUTLANE = {
+const RULE_OUTHOLE = {
   name: 'Outhole',
   switchDownTimeMs: 5,
   switchIdToTrigger: 18,
@@ -24,7 +24,7 @@ const RULESET = [
     switchIdToTrigger: 16,
     nextState: 'Right Trough',
     transitionTimeMs: 1,
-    options: 'INSTANT_LEAVE_STATE',
+    options: ['INSTANT_LEAVE_STATE'],
   },
   {
     name: 'Left Trough',
@@ -32,15 +32,15 @@ const RULESET = [
     switchIdToTrigger: 15,
     nextState: 'Center Trough',
     transitionTimeMs: 1,
-    options: 'INSTANT_LEAVE_STATE',
+    options: ['INSTANT_LEAVE_STATE'],
   },
-  RULE_OUTLANE,
+  RULE_OUTHOLE,
   {
     name: 'Drain',
     switchDownTimeMs: 1,
     nextState: 'Outhole',
     transitionTimeMs: 0,
-    options: 'INSTANT_LEAVE_STATE',
+    options: ['INSTANT_LEAVE_STATE'],
   },
   {
     name: 'Shooter',
@@ -54,5 +54,5 @@ const RULESET = [
 
 module.exports = {
   RULESET,
-  RULE_OUTLANE,
+  RULE_OUTHOLE,
 };
