@@ -275,6 +275,7 @@ This very primitive schema shows where the switches are:
 
 ### Invalid Switch state
 `check fuses f101 and f109, j127 and opto 12v supply`
+
 `check fuses f115 and f116, j112 and opto 12v supply`
 
 - check the initial switch state, possible that a switch is in the wrong state
