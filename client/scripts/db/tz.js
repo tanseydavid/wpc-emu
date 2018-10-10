@@ -4,14 +4,14 @@ module.exports = {
   name: 'Twilight Zone',
   version: 'H-8',
   rom: {
-    u06: 'https://s3-eu-west-1.amazonaws.com/foo-temp/tz_h8.u6',
-    u14: 'https://s3-eu-west-1.amazonaws.com/foo-temp/Bally_1993_Twilight_Zone_TZ_Sound_P3_U14.rom',
-    u15: 'https://s3-eu-west-1.amazonaws.com/foo-temp/Bally_1993_Twilight_Zone_TZ_Sound_P3_U15.rom',
-    u18: 'https://s3-eu-west-1.amazonaws.com/foo-temp/Bally_1993_Twilight_Zone_TZ_Sound_P3_U18.rom',
+    u06: 'tz_h8.u6',
+    u14: 'Bally_1993_Twilight_Zone_TZ_Sound_P3_U14.rom',
+    u15: 'Bally_1993_Twilight_Zone_TZ_Sound_P3_U15.rom',
+    u18: 'Bally_1993_Twilight_Zone_TZ_Sound_P3_U18.rom',
   },
   playfield: {
     //size must be 200x400, lamp positions according to image
-    image: 'https://s3-eu-west-1.amazonaws.com/foo-temp/playfield-tz.jpg',
+    image: 'playfield-tz.jpg',
   },
   switchMapping: [
     { id: 11, name: 'RIGHT INLANE' },
@@ -22,6 +22,7 @@ module.exports = {
     { id: 16, name: 'CENTER TROUGH' },
     { id: 17, name: 'LEFT TROUGH' },
     { id: 18, name: 'OUTHOLE' },
+
     { id: 21, name: 'SLAM TILT' },
     { id: 22, name: 'COIN DOOR CLOSED' },
     { id: 23, name: 'BUY-IN BUTTON' },
@@ -29,6 +30,7 @@ module.exports = {
     { id: 26, name: 'TROUGH PROXIMITY' },
     { id: 27, name: 'BALL SHOOTER' },
     { id: 28, name: 'ROCKET KICKER' },
+
     { id: 31, name: 'LEFT JET BUMPER' },
     { id: 32, name: 'RIGHT JET BUMPER' },
     { id: 33, name: 'LOWER JET BUMPER' },
@@ -37,6 +39,7 @@ module.exports = {
     { id: 36, name: 'LEFT OUTLANE' },
     { id: 37, name: 'LEFT INLANE 1' },
     { id: 38, name: 'LEFT INLANE 2' },
+
     { id: 41, name: 'DEAD END' },
     { id: 42, name: 'THE CAMERA' },
     { id: 43, name: 'PLAYER PIANO' },
@@ -45,6 +48,7 @@ module.exports = {
     { id: 46, name: 'MINI PF RGHT (2)' },
     { id: 47, name: 'CLOCK MILLIONS' },
     { id: 48, name: 'LOW LEFT 5 MIL' },
+
     { id: 51, name: 'GUM POPPER LANE' },
     { id: 52, name: 'HITCH-HIKER' },
     { id: 53, name: 'LEFT RAMP ENTER' },
@@ -53,6 +57,7 @@ module.exports = {
     { id: 56, name: 'GUMBALL EXIT' },
     { id: 57, name: 'SLOT PROXIMITY' },
     { id: 58, name: 'SLOT KICKOUT' },
+
     { id: 61, name: 'LOWER SKILL' },
     { id: 62, name: 'CENTER SKILL' },
     { id: 63, name: 'UPPER SKILL' },
@@ -61,6 +66,7 @@ module.exports = {
     { id: 66, name: 'MID R 5 MIL 1' },
     { id: 67, name: 'MID R 5 MIL 2' },
     { id: 68, name: 'LOW RIGHT 5 MIL' },
+
     { id: 72, name: 'AUTO-FIRE KICKER' },
     { id: 73, name: 'RIGHT RAMP' },
     { id: 74, name: 'GUMBALL POPPER' },
@@ -68,6 +74,7 @@ module.exports = {
     { id: 76, name: 'MINI PF EXIT' },
     { id: 77, name: 'MID LEFT 5 MIL' },
     { id: 78, name: 'U LEFT 5 MIL' },
+    
     { id: 81, name: 'RIGHT MAGNET' },
     { id: 83, name: 'LEFT MAGNET' },
     { id: 84, name: 'LOCK CENTER' },
@@ -75,9 +82,21 @@ module.exports = {
     { id: 87, name: 'GUMBALL ENTER' },
     { id: 88, name: 'LOCK LOWER' },
   ],
+  fliptronicsMapping: [
+    { id: 'F1', name: 'R FLIPPER EOS' },
+    { id: 'F2', name: 'R FLIPPER BUTTON' },
+    { id: 'F3', name: 'L FLIPPER EOS' },
+    { id: 'F4', name: 'L FLIPPER BUTTON' },
+  ],
   skipWmcRomCheck: true,
   initialise: {
-    closedSwitches: [ 15, 16, 17 ],
+    closedSwitches: [
+      15, 16, 17,
+      22,
+      //OPTO SWITCHES:
+      71, 72, 73, 74, 75, 76, 81, 82, 83, 84, 85, 86, 87,
+      'F2', 'F4',
+    ],
     initialAction: [
       {
         delayMs: 1000,

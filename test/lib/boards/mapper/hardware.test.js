@@ -20,6 +20,42 @@ test('HardwareMapper, should get address, -1', (t) => {
   t.throws(() => HardwareMapper.getAddress(-1), 'HW_GET_ADDRESS_INVALID_MEMORY_REGION_0xffff');
 });
 
+test('HardwareMapper, should get address, 0x3200 (DMD PAGE)', (t) => {
+  const expectedResult = {
+    offset: 0x3200,
+    subsystem: 'dmd',
+  };
+  const result = HardwareMapper.getAddress(0x3200);
+  t.deepEqual(result, expectedResult);
+});
+
+test('HardwareMapper, should get address, 0x3BFF (DMD PAGE)', (t) => {
+  const expectedResult = {
+    offset: 0x3BFF,
+    subsystem: 'dmd',
+  };
+  const result = HardwareMapper.getAddress(0x3BFF);
+  t.deepEqual(result, expectedResult);
+});
+
+test('HardwareMapper, should get address, 0x3800 (DMD PAGE 1)', (t) => {
+  const expectedResult = {
+    offset: 0x3800,
+    subsystem: 'dmd',
+  };
+  const result = HardwareMapper.getAddress(0x3800);
+  t.deepEqual(result, expectedResult);
+});
+
+test('HardwareMapper, should get address, 0x3A00 (DMD PAGE 2)', (t) => {
+  const expectedResult = {
+    offset: 0x3A00,
+    subsystem: 'dmd',
+  };
+  const result = HardwareMapper.getAddress(0x3A00);
+  t.deepEqual(result, expectedResult);
+});
+
 test('HardwareMapper, should get address, 0x4000', (t) => {
   t.throws(() => HardwareMapper.getAddress(0x4000), 'HW_GET_ADDRESS_INVALID_MEMORY_REGION_0x4000');
 });
@@ -115,5 +151,15 @@ test('HardwareMapper, should get address, 0x3FE0', (t) => {
     subsystem: 'wpcio',
   };
   const result = HardwareMapper.getAddress(0x3FE0);
+  t.deepEqual(result, expectedResult);
+});
+
+test('HardwareMapper, should get exception for fliptronics address', (t) => {
+  const MEMORY_ADDR_FLIPTRONICS_FLIPPER_PORT_A = 0x3FD4;
+  const expectedResult = {
+    offset: MEMORY_ADDR_FLIPTRONICS_FLIPPER_PORT_A,
+    subsystem: 'wpcio',
+  };
+  const result = HardwareMapper.getAddress(MEMORY_ADDR_FLIPTRONICS_FLIPPER_PORT_A);
   t.deepEqual(result, expectedResult);
 });

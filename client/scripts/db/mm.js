@@ -4,7 +4,7 @@ module.exports = {
   name: 'Medieval Madness',
   version: 'L-8',
   rom: {
-    u06: 'https://s3-eu-west-1.amazonaws.com/foo-temp/mm_109b.bin',
+    u06: 'mm_109b.bin',
   },
   switchMapping: [
     { id: 11, name: 'LAUNCH BUTTON' },
@@ -63,9 +63,25 @@ module.exports = {
     { id: 74, name: 'L TROLL UP' },
     { id: 75, name: 'R TROLL UP' },
   ],
+  fliptronicsMapping: [
+    { id: 'F1', name: 'R FLIPPER EOS' },
+    { id: 'F2', name: 'R FLIPPER BUTTON' },
+    { id: 'F3', name: 'L FLIPPER EOS' },
+    { id: 'F4', name: 'L FLIPPER BUTTON' },
+    { id: 'F6', name: 'UR FLIPPER BUT' },
+    { id: 'F8', name: 'UL FLIPPER BUT' },
+  ],
   skipWmcRomCheck: true,
+  features: [
+    'securityPic',
+  ],
   initialise: {
-    closedSwitches: [ 22, 32, 33, 34, 35 ],
+    closedSwitches: [
+      22,
+      //OPTO SWITCHES: 31, 32, 33, 34, 35, 36, 37, 41,
+      31, 36, 37, 41,
+      'F2', 'F4', 'F6', 'F8',
+    ],
     initialAction: [
       {
         delayMs: 1000,

@@ -14,7 +14,7 @@ const CANVAS_WIDTH = 815 + LAMP_DISPLAY_WIDTH;
 const CANVAS_HEIGHT = 560;
 const YPOS_DMD_MAIN_VIEW = 15;
 const YPOS_GENERIC_DATA = 225;
-const YPOS_DMD_DATA = 400;
+const YPOS_DMD_DATA = 415;
 const YPOS_MEM_DATA = YPOS_DMD_DATA + 65;
 
 const LEFT_X_OFFSET = 15;
@@ -54,7 +54,7 @@ function updateCanvas(emuState, cpuState) {
     return;
   }
   canvas.fillStyle = '#000';
-  canvas.fillRect(LEFT_X_OFFSET, YPOS_GENERIC_DATA, 245, 145);
+  canvas.fillRect(LEFT_X_OFFSET, YPOS_GENERIC_DATA, 245, 165);
   canvas.fillRect(LEFT_X_OFFSET, YPOS_DMD_DATA, 150, 40);
 
   canvas.fillStyle = COLOR_DMD[2];
@@ -67,27 +67,30 @@ function updateCanvas(emuState, cpuState) {
     LEFT_X_OFFSET, YPOS_GENERIC_DATA + 50);
   canvas.fillText('FIRQ CALLS/MISSED: ' + emuState.firqCount + '/' + emuState.missedFirqCall,
     LEFT_X_OFFSET, YPOS_GENERIC_DATA + 60);
+  canvas.fillText('NMI CALLS: ' + emuState.nmiCount, LEFT_X_OFFSET, YPOS_GENERIC_DATA + 70);
 
   const diagnosticLed = emuState.asic.wpc.diagnosticLed ? 1 : 0;
   const activePage = emuState.asic.dmd.activepage;
-  canvas.fillText('DIAGLED STATE: ' + diagnosticLed, LEFT_X_OFFSET, YPOS_GENERIC_DATA + 70);
-  canvas.fillText('DIAGLED TOGGLE COUNT: ' + emuState.asic.wpc.diagnosticLedToggleCount, LEFT_X_OFFSET, YPOS_GENERIC_DATA + 80);
-  canvas.fillText('ACTIVE ROM BANK: ' + emuState.asic.wpc.activeRomBank, LEFT_X_OFFSET, YPOS_GENERIC_DATA + 90);
-  canvas.fillText('WRITE TO LOCKED MEM: ' + emuState.protectedMemoryWriteAttempts, LEFT_X_OFFSET, YPOS_GENERIC_DATA + 100);
+  canvas.fillText('DIAGLED STATE: ' + diagnosticLed, LEFT_X_OFFSET, YPOS_GENERIC_DATA + 80);
+  canvas.fillText('DIAGLED TOGGLE COUNT: ' + emuState.asic.wpc.diagnosticLedToggleCount, LEFT_X_OFFSET, YPOS_GENERIC_DATA + 90);
+  canvas.fillText('ACTIVE ROM BANK: ' + emuState.asic.wpc.activeRomBank, LEFT_X_OFFSET, YPOS_GENERIC_DATA + 100);
+  canvas.fillText('WRITE TO LOCKED MEM: ' + emuState.protectedMemoryWriteAttempts, LEFT_X_OFFSET, YPOS_GENERIC_DATA + 110);
 
-  canvas.fillText('SND CPU TICK: ' + emuState.asic.sound.ticks, LEFT_X_OFFSET, YPOS_GENERIC_DATA + 110);
+  canvas.fillText('SND CPU TICK: ' + emuState.asic.sound.ticks, LEFT_X_OFFSET, YPOS_GENERIC_DATA + 120);
   canvas.fillText('SND IRQ CALLS/MISSED: ' + emuState.asic.sound.irqCount + '/' + emuState.asic.sound.missedIrqCall,
-    LEFT_X_OFFSET, YPOS_GENERIC_DATA + 120);
-  canvas.fillText('SND FIRQ CALLS/MISSED: ' + emuState.asic.sound.firqCount + '/' + emuState.asic.sound.missedFirqCall,
     LEFT_X_OFFSET, YPOS_GENERIC_DATA + 130);
-  canvas.fillText('SND VOLUME: ' + emuState.asic.sound.volume, LEFT_X_OFFSET, YPOS_GENERIC_DATA + 140);
+  canvas.fillText('SND FIRQ CALLS/MISSED: ' + emuState.asic.sound.firqCount + '/' + emuState.asic.sound.missedFirqCall,
+    LEFT_X_OFFSET, YPOS_GENERIC_DATA + 140);
+  canvas.fillText('SND NMI CALLS: ' + emuState.asic.sound.nmiCount,
+    LEFT_X_OFFSET, YPOS_GENERIC_DATA + 150);
+  canvas.fillText('SND VOLUME: ' + emuState.asic.sound.volume, LEFT_X_OFFSET, YPOS_GENERIC_DATA + 160);
 
   canvas.fillText('DMD LOW PAGE: ' + emuState.asic.dmd.lowpage, LEFT_X_OFFSET, YPOS_DMD_DATA + 10);
   canvas.fillText('DMD HIGH PAGE: ' + emuState.asic.dmd.highpage, LEFT_X_OFFSET, YPOS_DMD_DATA + 20);
   canvas.fillText('DMD ACTIVE PAGE: ' + activePage, LEFT_X_OFFSET, YPOS_DMD_DATA + 30);
 
   if (emuState.asic.sound.ram) {
-    drawMemRegion(emuState.asic.sound.ram, LEFT_X_OFFSET + 125, YPOS_MEM_DATA + 20, 120);
+    drawMemRegion(emuState.asic.sound.ram, LEFT_X_OFFSET + 125, YPOS_MEM_DATA, 120);
   }
 
   if (emuState.asic.dmd.dmdShadedBuffer) {
@@ -95,7 +98,7 @@ function updateCanvas(emuState, cpuState) {
   }
 
   if (emuState.asic.ram) {
-    drawMemRegion(emuState.asic.ram, LEFT_X_OFFSET, YPOS_MEM_DATA + 20, 120);
+    drawMemRegion(emuState.asic.ram, LEFT_X_OFFSET, YPOS_MEM_DATA, 120);
   }
 
   if (emuState.asic.wpc.lampState) {
@@ -110,7 +113,7 @@ function updateCanvas(emuState, cpuState) {
   }
 
   if (emuState.asic.wpc.inputState) {
-    drawMatrix8x8Binary(emuState.asic.wpc.inputState, RIGHT_PLUS_X_OFFSET, YPOS_GENERIC_DATA + 20);
+    drawInputStateMatrix(emuState.asic.wpc.inputState, RIGHT_PLUS_X_OFFSET, YPOS_GENERIC_DATA + 20);
   }
 
   drawMatrix8x8(emuState.asic.wpc.generalIlluminationState, MIDDLE_PLUS_X_OFFSET, YPOS_GENERIC_DATA + 20);
@@ -124,7 +127,7 @@ function updateCanvas(emuState, cpuState) {
   // draw only 4 dmd frames to avoid dropping fps
   if (Array.isArray(videoRam)) {
     let xpos = MIDDLE_X_OFFSET;
-    let ypos = YPOS_DMD_DATA + 20;
+    let ypos = YPOS_DMD_DATA;
     for (let i = 0; i < dmdRow * 4; i++) {
       xpos += 130;
       if (xpos > (800 - 130)) {
@@ -222,9 +225,9 @@ function drawLampPositions(lampState, x, y) {
   });
 }
 
-function drawMatrix8x8Binary(data, x, y) {
+function drawInputStateMatrix(data, x, y) {
   const dataUnpacked = [];
-  for (let i = 0; i < 9; i++) {
+  for (let i = 0; i < 10; i++) {
     for (let j = 0; j < 8; j++) {
       const entry = data[i] & BIT_ARRAY[j];
       dataUnpacked.push(entry > 0 ? 255 : 0);
@@ -292,7 +295,6 @@ function initCanvas() {
   canvas.fillStyle = COLOR_DMD[3];
   canvas.fillText('# DEBUG DATA:', LEFT_X_OFFSET, YPOS_GENERIC_DATA);
   canvas.fillText('# DMD BOARD DATA:', LEFT_X_OFFSET, YPOS_DMD_DATA);
-  canvas.fillText('# MEMORY:', LEFT_X_OFFSET, YPOS_MEM_DATA);
 
   canvas.fillStyle = COLOR_DMD[2];
   canvas.fillText('SOLENOID OUT MATRIX', MIDDLE_X_OFFSET, YPOS_GENERIC_DATA + 10);
@@ -300,8 +302,8 @@ function initCanvas() {
   canvas.fillText('LAMP OUT MATRIX', RIGHT_X_OFFSET, YPOS_GENERIC_DATA + 10);
   canvas.fillText('SWITCH IN MATRIX', RIGHT_PLUS_X_OFFSET, YPOS_GENERIC_DATA + 10);
   canvas.fillText('DMD PAGE RAM:', MIDDLE_X_OFFSET, YPOS_DMD_DATA + 10);
-  canvas.fillText('WPC CPU RAM:', LEFT_X_OFFSET, YPOS_MEM_DATA + 10);
-  canvas.fillText('SOUND CPU RAM:', LEFT_X_OFFSET + 125, YPOS_MEM_DATA + 10);
+  canvas.fillText('WPC CPU RAM:', LEFT_X_OFFSET, YPOS_MEM_DATA - 10);
+  canvas.fillText('SOUND CPU RAM:', LEFT_X_OFFSET + 125, YPOS_MEM_DATA - 10);
 }
 
 function initialise(gameEntry) {
@@ -329,7 +331,7 @@ function initialise(gameEntry) {
     playfieldImage.onload = function() {
       canvas.drawImage(playfieldImage, 800, YPOS_DMD_MAIN_VIEW);
     };
-    playfieldImage.src = playfieldData.image;
+    playfieldImage.src = FETCHURL + playfieldData.image;
   }
 
   initCanvas();

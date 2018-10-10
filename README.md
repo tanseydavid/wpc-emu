@@ -23,15 +23,16 @@ Reference: http://bcd.github.io/freewpc/The-WPC-Hardware.html#The-WPC-Hardware
 - Watchdog (not sure if needed, no reboot in case of an error which make it easier to find bugs in the emu)
 - Bit Shifter ✓
 - Memory Protection ✓
-- Time of Day Clock ✓ - not sure, Twilight Zone's Clock time does not work
+- Time of Day Clock ✓
 - High Resolution Timer (not used, was used by alphanumeric games to do display dimming)
 - Bank Switching ✓
 - The Switch Matrix ✓
 - External I/O ✓ (except sound)
+- Fliptronic Flipper ✓
 - Interrupt Reset ✓
 - Interrupt IRQ ✓
 - Interrupt FIRQ ✓ (incl. source - not sure if needed)
-- Security Chip
+- Security Chip ✓
 
 ## Power Driver Board
 - Lamp Circuits ✓
@@ -41,7 +42,8 @@ Reference: http://bcd.github.io/freewpc/The-WPC-Hardware.html#The-WPC-Hardware
 - support Fliptronics flipper
 
 ## Sound Board
-- load Sound ROM files ✓
+- load pre DCS sound ROM files ✓
+- load DCS sound ROM files
 - Bank Switching ✓
 - Resample audio to 44.1khz
 - emulate 6809 CPU ✓
@@ -54,12 +56,30 @@ Reference: http://bcd.github.io/freewpc/The-WPC-Hardware.html#The-WPC-Hardware
 - Page Selection ✓
 - Scanline Handling ✓
 - Dimming / multi color display ✓
+- WPC 95 support ✓
 
 ## Debug UI
 - DMD output ✓
+- VideoRAM output ✓
 - Debug KPI ✓
 - Cabinet input keys work ✓
+- Switch input keys work ✓
+- Fliptronics input keys work ✓
 - Adaptive FPS ✓
+
+# Development
+
+## Serve ROM's from localhost
+- create the `./rom` directory and copy your ROM files inside this directory
+- Run `npm run start:fileserv` to start local file serve
+- check out the "Run Watch" chapter
+
+## Run Watch
+- Run `npm run watch` in the root directory and the `client` directory
+
+## Build Release
+- Run `build:production` in the root directory and the `client` directory
+- output is available in the `./dist` directory
 
 # Future ideas
 - Hook it up to a Virtual Pinball / Pinball frontend
@@ -147,10 +167,83 @@ Timings are very tight, we cannot use `setTimeout`/`setInterval` to call for exa
 main loop that executes some CPU ops then check if one of the following callbacks need to be triggered:
 - each 2049 ticks call IRQ (1025us)
 - each 16667 ticks update ZeroCross flag (8.3ms)
-- each 512 ticks update display Scanline (256us)
+- each 512 ticks update display scanline (256us)
 
 ### DMD display scanline
 The controller fetches 1 byte (8 pixels) every 32 CPU cycles (16 microseconds). At this rate, it takes 256 microseconds per row and a little more than 8 milliseconds per complete frame.
+
+## DMD controller
+
+WPC-89 exposes two memory regions (length 0x200 bytes) to write to the video ram:
+- `0x3800 - 0x39FE` for bank 1
+- `0x3A00 - 0x3BFF` for bank 2
+
+WPC-95 added four CPU accessible video ram pages:
+- `0x3000 - 0x31FF` for bank 3
+- `0x3200 - 0x33FF` for bank 4
+- `0x3400 - 0x35FF` for bank 5
+- `0x3600 - 0x37FF` for bank 6
+
+Each bank can point to an individual address to one of the 16 video ram pages.
+
+TODO: I could not find a game that uses those additional video ram pages yet!
+
+## Security PIC (U22)
+FreeWPC documentation about this security feature:
+
+```
+A security PIC chip is added between the ASIC and the switch matrix
+inputs.  The CPU no longer reads the switch data directly; it sends
+commands to the PIC which then reads the data.  The PIC requires some
+special cryptic codes to be sent otherwise it will not return valid
+switch data, making the game unplayable.
+```
+- If the security chip implementation is invalid, the DMD display will show "U22 ERROR" or "G10 ERROR" (WPC95)
+- If the security chip works but does not match the expected Pinball model, the DMD will show "Incorrect U22 for this game"
+
+WPC-EMU uses the technique by Ed Cheung (http://www.edcheung.com/album/album07/Pinball/wpc_sound2.htm)
+to bypass the Security PIC:
+
+```
+The ROM is searched sequentially for "EC 9F xx yy 83 12 34".  This is a
+pattern that marks the address of a pointer to the location of the game ID.
+at this location there is a 2 byte number which is the game id
+```
+**NOTE**: this works only for WPC games but NOT for FreeWPC games!
+
+The file `rom/game-id.js` searches the ROM for the (unique) game ID. This id is later patched
+(using the memory patch function) with the game ID of Medieval Madness (Game ID: 559).
+
+- Dirty Harry (530) game ID is stored at location 0xE873 and contains 0xE8/0x73
+- Medieval Madness (559) game ID is stored at location 0xE885 and contains 0xE8/0x85
+- No Fear (525) game ID is stored at location 0xE80D and contains 0xE8/0x0D
+
+Here is a debug log of "Dirty Harry" ROM booting and the read the game ID. The pointer to the game ID location
+is stored at 0x81C9/0x81CA (16 bit) for this game.
+
+```
+2018-10-04T21:33:43.053Z wpcemu:boards:cpu-board mem-read 81c9
+2018-10-04T21:33:43.053Z wpcemu:boards:cpu-board mem-read 81ca
+2018-10-04T21:33:43.053Z wpcemu:boards:cpu-board read securityPic machine id
+2018-10-04T21:33:43.053Z wpcemu:boards:cpu-board mem-read e873
+2018-10-04T21:33:43.053Z wpcemu:boards:cpu-board mem-read e874
+```
+
+## RAM positions
+
+Known RAM positions for WPC games
+
+| Offset        | Comment        |
+| ------------- | -------------- |
+| 0x1800        | Date, year hi  |
+| 0x1801        | Date, year lo  |
+| 0x1802        | Date, month    |
+| 0x1803        | Date, day of month |
+| 0x1804        | Date, days since sunday |
+| 0x1805        | Date, 0x00 ? |
+| 0x1806        | Date, 0x01 ? |
+| 0x1807        | Date, checksum hi |
+| 0x1808        | Date, checksum lo |
 
 ## Gameplay
 - (during active game) if you press and keep pressed left or right FLIPPER - a status report will be shown
@@ -176,7 +269,16 @@ This very primitive schema shows where the switches are:
 
 ## To Test:
 - memory position of current score, player number, credits
-- serial port? 
+- serial port?
+
+## Error Messages
+
+### Invalid Switch state
+`check fuses f101 and f109, j127 and opto 12v supply`
+`check fuses f115 and f116, j112 and opto 12v supply`
+
+- check the initial switch state, possible that a switch is in the wrong state
+- NOTE: opto switches are closed in the initial state!
 
 # References
 

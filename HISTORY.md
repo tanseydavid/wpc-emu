@@ -1,5 +1,35 @@
 # HISTORY
 
+## 09/10/18
+- Implemented WPC-95 DMD mapping
+- Add opto switches config to game libs
+
+## 08/10/18
+- write time checksum to RAM, current time is correct now
+
+## 07/10/18
+- client works again on old safari browser (ios)
+
+## 06/10/18
+- fix dip country selection, twilight zone should work again
+
+## 05/10/18
+- security Pic works
+
+## 04/10/18
+- option to serve ROM files from localhost
+
+## 01/10/18
+- fix dipswitch settings, use USA/CANADA
+
+## 30/09/18
+- refactor fliptronics switch input, handled by input switch matrix
+- display fliptronics switches in debug ui
+
+## 29/09/18
+- support fliptronics switches
+- cpu errors now on invalid state - currently more crashes
+
 ## 22/09/18
 - support more visualisation in games
 - fixed dmd reset
@@ -12,7 +42,7 @@
 
 ## 07/09/18
 - show flasher in client
-- use multiple canvas 
+- use multiple canvas
 
 ## 07/09/18
 - update ui, add playfield db entry

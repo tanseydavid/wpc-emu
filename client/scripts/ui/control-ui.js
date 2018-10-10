@@ -5,7 +5,6 @@ import { replaceNode } from './htmlselector';
 
 export { populateControlUiView };
 
-const INITIAL_GAME = 'Hurricane';
 let selectedIndex = -1;
 
 function addEmulatorControls() {
@@ -15,8 +14,9 @@ function addEmulatorControls() {
 }
 
 function addGameSpecificControls(gameEntry) {
-  const element = document.getElementById('pinball-specfic-switch-input');
+  //switch input
   if (Array.isArray(gameEntry.switchMapping)) {
+    const element = document.getElementById('pinball-specific-switch-input');
     gameEntry.switchMapping.forEach((mapping) => {
       const child = document.createElement('button');
       child.textContent = mapping.name;
@@ -27,6 +27,22 @@ function addGameSpecificControls(gameEntry) {
       element.appendChild(child);
     });
   }
+
+  //fliptronics input
+  if (Array.isArray(gameEntry.fliptronicsMapping)) {
+    const element = document.getElementById('pinball-specific-fliptronics-input');
+    gameEntry.fliptronicsMapping.forEach((mapping) => {
+      const child = document.createElement('button');
+      child.textContent = mapping.name;
+      child.className = 'button-black button-outline button-small black';
+      child.addEventListener('click', () => {
+        window.wpcInterface.wpcSystem.setFliptronicsInput(mapping.id);
+      });
+      element.appendChild(child);
+    });
+  } else {
+    replaceNode('pinball-specific-fliptronics-root', document.createElement('div'));
+  }
 }
 
 function loadROM(event) {
@@ -36,7 +52,7 @@ function loadROM(event) {
   wpcInterface.romSelection(selectedRom);
 }
 
-function addGameTitles(gameList) {
+function addGameTitles(gameList, initialGameName) {
   const selectElementRoot = document.getElementById('game-selection');
   const selectElement = document.createElement('select');
   gameList.getAllNames().forEach((name, index) => {
@@ -44,7 +60,7 @@ function addGameTitles(gameList) {
     option.value = name;
     option.text = name;
     selectElement.add(option, null);
-    if (selectedIndex === -1 && name === INITIAL_GAME) {
+    if (selectedIndex === -1 && name === initialGameName) {
       selectedIndex = index;
     }
   });
@@ -57,9 +73,9 @@ function addGameTitles(gameList) {
   selectElementRoot.appendChild(selectElement);
 }
 
-function populateControlUiView(gameEntry, gameList) {
-  console.log(gameEntry);
+function populateControlUiView(gameEntry, gameList, initialGameName) {
+  console.log('gameEntry', gameEntry);
   addEmulatorControls();
   addGameSpecificControls(gameEntry);
-  addGameTitles(gameList);
+  addGameTitles(gameList, initialGameName);
 }

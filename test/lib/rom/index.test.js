@@ -32,6 +32,6 @@ test('romParser should parse roms', (t) => {
       t.is(result.fileName, 'Unknown');
       t.is(result.romSizeMBit, 2);
       t.is(result.skipWmcRomCheck, false);
-      t.deepEqual(result.switchesEnabled, []);
+      t.is(result.hasSecurityPic, false);
     });
 });

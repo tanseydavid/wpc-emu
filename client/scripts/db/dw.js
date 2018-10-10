@@ -4,10 +4,10 @@ module.exports = {
   name: 'Dr. Who',
   version: 'L-1',
   rom: {
-    u06: 'https://s3-eu-west-1.amazonaws.com/foo-temp/drwho_l2.rom',
-    u14: 'https://s3-eu-west-1.amazonaws.com/foo-temp/dw_u14.l1',
-    u15: 'https://s3-eu-west-1.amazonaws.com/foo-temp/dw_u15.l1',
-    u18: 'https://s3-eu-west-1.amazonaws.com/foo-temp/dw_u18.l1',
+    u06: 'drwho_l2.rom',
+    u14: 'dw_u14.l1',
+    u15: 'dw_u15.l1',
+    u18: 'dw_u18.l1',
   },
   switchMapping: [
     { id: 13, name: 'START BUTTON' },
@@ -73,9 +73,25 @@ module.exports = {
     { id: 82, name: 'PLAYFIELD GLASS' },
     { id: 88, name: 'MINI DOOR RIGHT' },
   ],
+  fliptronicsMapping: [
+    { id: 'F1', name: 'R FLIPPER EOS' },
+    { id: 'F2', name: 'R FLIPPER BUTTON' },
+    { id: 'F3', name: 'L FLIPPER EOS' },
+    { id: 'F4', name: 'L FLIPPER BUTTON' },
+    { id: 'F5', name: 'UR FLIPPER EOS' },
+    { id: 'F6', name: 'UR FLIPPER BUT' },
+    { id: 'F7', name: 'UL FLIPPER EOS' },
+    { id: 'F8', name: 'UL FLIPPER BUT' },
+  ],
   skipWmcRomCheck: true,
   initialise: {
-    closedSwitches: [ 22, 25, 26, 27, 82 ],
+    closedSwitches: [
+      22, 25, 26, 27,
+      82,
+      //OPTO SWITCHES
+      31, 32, 33, 71, 72, 73, 74, 75, 76, 77,
+      'F2', 'F4', 'F6', 'F8',
+    ],
     initialAction: [
       {
         delayMs: 1000,

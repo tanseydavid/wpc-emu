@@ -4,14 +4,14 @@ module.exports = {
   name: 'Fish Tales',
   version: 'P-4',
   rom: {
-    u06: 'https://s3-eu-west-1.amazonaws.com/foo-temp/ft_p4.u6',
-    u14: 'https://s3-eu-west-1.amazonaws.com/foo-temp/t2_u14.l3',
-    u15: 'https://s3-eu-west-1.amazonaws.com/foo-temp/t2_u15.l3',
-    u18: 'https://s3-eu-west-1.amazonaws.com/foo-temp/t2_u18.l3',
+    u06: 'ft_p4.u6',
+    u14: 't2_u14.l3',
+    u15: 't2_u15.l3',
+    u18: 't2_u18.l3',
   },
   playfield: {
     //size must be 200x400, lamp positions according to image
-    image: 'https://s3-eu-west-1.amazonaws.com/foo-temp/playfield-ft.jpg',
+    image: 'playfield-ft.jpg',
     lamps: [
       [{ x: 93, y: 165, color: 'WHITE' }], //11
       [{ x: 93, y: 155, color: 'GREEN' }],
@@ -144,17 +144,20 @@ module.exports = {
     { id: 64, name: 'TOP LEFT LOOP' },
     { id: 65, name: 'RIGHT RETURN' },
     { id: 66, name: 'RIGHT OUTLANE' },
-    //TODO support
-    /*
-    { id: F1, name: 'R FLIPPER EOS' },
-    { id: F2, name: 'R FLIPPER BUTTON' },
-    { id: F3, name: 'L FLIPPER EOS' },
-    { id: F4, name: 'L FLIPPER BUTTON' },
-    */
+  ],
+  fliptronicsMapping: [
+    { id: 'F1', name: 'R FLIPPER EOS' },
+    { id: 'F2', name: 'R FLIPPER BUTTON' },
+    { id: 'F3', name: 'L FLIPPER EOS' },
+    { id: 'F4', name: 'L FLIPPER BUTTON' },
   ],
   skipWmcRomCheck: true,
   initialise: {
-    closedSwitches: [ 15, 16, 17, 18 ],
+    closedSwitches: [
+      15, 16, 17, 18,
+      22,
+      'F2', 'F4',
+    ],
     initialAction: [
       {
         delayMs: 1000,

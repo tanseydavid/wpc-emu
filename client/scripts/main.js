@@ -14,6 +14,7 @@ import * as emuDebugUi from './ui/emu-debug-ui';
 const TICKS = 2000000;
 const DESIRED_FPS = 58;
 const TICKS_PER_STEP = parseInt(TICKS / DESIRED_FPS, 10);
+const INITIAL_GAME = 'Hurricane';
 
 const AudioContext = window.AudioContext || window.webkitAudioContext;
 const soundInstance = AudioOutput(AudioContext);
@@ -27,9 +28,9 @@ function dacCallback(value) {
 
 function initialiseEmu(gameEntry) {
   const u06Promise = downloadFileFromUrlAsUInt8Array(gameEntry.rom.u06);
-  const u14Promise = downloadFileFromUrlAsUInt8Array(gameEntry.rom.u14).catch(() => []);
-  const u15Promise = downloadFileFromUrlAsUInt8Array(gameEntry.rom.u15).catch(() => []);
-  const u18Promise = downloadFileFromUrlAsUInt8Array(gameEntry.rom.u18);
+  const u14Promise = downloadFileFromUrlAsUInt8Array(gameEntry.rom.u14).catch(() => {});
+  const u15Promise = downloadFileFromUrlAsUInt8Array(gameEntry.rom.u15).catch(() => {});
+  const u18Promise = downloadFileFromUrlAsUInt8Array(gameEntry.rom.u18).catch(() => {});
 
   return Promise.all([
       u06Promise,
@@ -48,7 +49,7 @@ function initialiseEmu(gameEntry) {
       return initialiseEmulator(romData, gameEntry);
     })
     .then((_wpcSystem) => {
-      console.log('Successully initialised emulator');
+      console.log('Successfully initialised emulator');
       wpcSystem = _wpcSystem;
       // TODO IIKS we pollute globals here
       window.wpcInterface = {
@@ -60,7 +61,7 @@ function initialiseEmu(gameEntry) {
       wpcSystem.registerAudioConsumer(dacCallback);
       wpcSystem.start();
       soundInstance.setMixStereoFunction(wpcSystem.mixStereo);
-      console.log('Successully started EMU');
+      console.log('Successully started EMU v' + wpcSystem.version());
       return emuDebugUi.initialise(gameEntry);
     })
     .catch((error) => {
@@ -75,7 +76,7 @@ function romSelection(romName) {
 
 function initEmuWithGameName(name) {
   const gameEntry = gamelist.getByName(name);
-  populateControlUiView(gameEntry, gamelist);
+  populateControlUiView(gameEntry, gamelist, name);
   return initialiseEmu(gameEntry)
     .then(() => {
       resumeEmu();
@@ -83,7 +84,7 @@ function initEmuWithGameName(name) {
     });
 }
 
-initEmuWithGameName('Hurricane');
+initEmuWithGameName(INITIAL_GAME);
 
 //called at 60hz -> 16.6ms
 function step() {
@@ -96,7 +97,7 @@ function step() {
 
 function resumeEmu() {
   if (intervalId) {
-    return;
+    pauseEmu();
   }
   console.log('client start emu');
   intervalId = requestAnimationFrame(step);
