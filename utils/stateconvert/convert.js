@@ -6,6 +6,14 @@ module.exports = {
   convertState,
 };
 
+const GAME_PLAYING = 'Playfield State';
+
+function convertState(state) {
+  const result = _convertState(state);
+  validateNextState(result);
+  return result;
+}
+
 function _convertDefines(data) {
   const cleanArray = data.map((_switch) => {
     return _switch
@@ -34,7 +42,7 @@ function _convertStateOffset(state) {
     .map((e) => e.trim());
 }
 
-function convertState(_state) {
+function _convertState(_state) {
   const stateOffset = _convertStateOffset(_state.STATEDEFINITION);
   if (_state.STATE.length - 3 !== stateOffset.length) {
     debug('_state.STATE.length', _state.STATE.length);
@@ -72,7 +80,7 @@ function convertState(_state) {
       name: stateArray[0],
       switchDownTimeMs: parseInt(stateArray[1], 10),
       switchIdToTrigger: switches[switchName],
-      solenoidIdToLeaveState: solenoids[solenoidName] || 0,
+      solenoidIdToLeaveState: solenoids[solenoidName] - 1 || 0,
       nextState: stateArray[4],
       transitionTimeMs: parseInt(stateArray[5], 10),
     };
@@ -96,15 +104,21 @@ function convertState(_state) {
       entry.nextState = step1[index].name;
     } else {
       if (entry.nextState === 'stFree') {
-        debug('!! TODO HANDLE stFree');
+        entry.nextState = GAME_PLAYING;
       } else {
         debug('!! UNKNOWN STATE:', entry.nextState);
-        debug('   -> REMOVE:', entry.name);
-        return;
+        debug('   -> MODIFY:', entry.name);
+        entry.nextState = GAME_PLAYING;
+        entry.options = ['INSTANT_LEAVE_STATE'];
+        delete entry.switchDownTimeMs;
       }
     }
     return entry;
   }).filter((element) => element);
+
+  const stFree = {
+    name: GAME_PLAYING,
+  };
 
   const initialState = {
     name: 'Initial State',
@@ -114,7 +128,7 @@ function convertState(_state) {
     options: ['INSTANT_LEAVE_STATE'],
   };
 
-  return [ initialState ].concat(step2);
+  return [ initialState, stFree ].concat(step2);
 }
 
 function checkUniqueName(data) {
@@ -127,4 +141,25 @@ function checkUniqueName(data) {
     debug('NON UNIQUE NAMES DETECTED %o', uniqueNames);
     throw new Error('NON_UNIQUE_NAMES_DETECTED');
   }
+}
+
+function validateNextState(data) {
+  const stateByName = data
+    .reduce((accumulator, currentValue) => {
+      const stateName = currentValue.name;
+      accumulator[stateName] = currentValue;
+      return accumulator;
+    }, []);
+  const availableStates = Object.keys(stateByName);
+
+  availableStates.forEach((state) => {
+    const entry = stateByName[state];
+    const nextState = entry.nextState;
+    if (nextState) {
+      if (!availableStates.includes(nextState)) {
+        debug('STATE: %O', data);
+        throw new Error('MISSING_STATE_' + nextState);
+      }
+    }
+  });
 }

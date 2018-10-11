@@ -4,10 +4,7 @@ module.exports = {
   name: 'FreeWPC T2',
   version: '1.00',
   rom: {
-    u06: 'ft20_32.rom',
-    u14: 't2_u14.l3',
-    u15: 't2_u15.l3',
-    u18: 't2_u18.l3',
+    u06: 'u6_l3.rom',
   },
   playfield: {
     //size must be 200x400, lamp positions according to image
