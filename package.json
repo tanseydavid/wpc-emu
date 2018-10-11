@@ -62,7 +62,7 @@
     "start:fileserv": "http-server ./rom --cors",
     "debug": "node --inspect index.js",
     "xo": "xo",
-    "test": "ava --verbose test/lib/**",
+    "test": "ava --verbose test/lib/** test/utils/**",
     "test:debug": "DEBUG='wpc*' ava --verbose test/lib/**",
     "test:integration": "ava --verbose test/integration/*.test.js",
     "test:runner": "node test/headless-runner.js",
