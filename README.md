@@ -26,7 +26,7 @@ Reference: http://bcd.github.io/freewpc/The-WPC-Hardware.html#The-WPC-Hardware
 - Time of Day Clock ✓
 - High Resolution Timer (not used, was used by alphanumeric games to do display dimming)
 - ROM Bank Switching ✓
-- RAM Bank Switching (WPC 95 only, not sure if needed, MAME does not implement it) 
+- RAM Bank Switching (WPC 95 only, not sure if needed, MAME does not implement it)
 - The Switch Matrix ✓
 - External I/O ✓ (except sound)
 - Fliptronic Flipper ✓
@@ -248,6 +248,8 @@ Known RAM positions for WPC games
 | 0x1806        | Date, 0x01 ? |
 | 0x1807        | Date, checksum hi |
 | 0x1808        | Date, checksum lo |
+
+Note: The initial memory check writes from offset 0x0000 - 0x1730.
 
 ## Gameplay
 - (during active game) if you press and keep pressed left or right FLIPPER - a status report will be shown
