@@ -1,3 +1,19 @@
+Currently unclear:
+- after the memory init code how is the main loop started? using watchdog or via irq trigger?
+
+---
+
+source: http://www.edcheung.com/album/album07/Pinball/wpc_sound.htm
+
+- After the reset is deasserted, the reset vector is fetched at FFFE and FFFF.  These are the last two bytes of the program ROM.
+- The ROM is checked first starting with the highest 32kbytes.  This is the non-paged section.  Then, the lower ones are checked in turn by using the paging register at 3FFC.
+- If that passes, the CPU moves onto the RAM check.  It does this by writing and then reading the data byte 0x55 to the RAM, and then repeating the test with 0xAA as data.
+- If that is ok, it continues with inits to the I/O such as the flippers, sound board, DMD, etc.
+- Then comes a lot of initialization which purpose is not clear to me.
+- After about one second of initialization, the main code enters an infinite loop and waits for an interrupt.
+
+---
+
 source: https://gist.github.com/74hc595/fda8b274179fea633f5333d52513e1f7
 
 ; bootup sequence from a Williams WPC pinball machine ROM

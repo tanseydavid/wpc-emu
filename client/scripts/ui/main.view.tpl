@@ -22,7 +22,7 @@
   </div>
   <div class="column column-10">Emulator</div>
   <div class="column column-40">
-    <button class="button-black button-small black" onclick="console.log('reset...'); wpcInterface.wpcSystem.reset();">RESET</button>
+    <button class="button-black button-small black" onclick="console.log('TRIGGER_RESET'); wpcInterface.wpcSystem.reset();">RESET</button>
     <button class="button-black button-outline button-small black" onclick="wpcInterface.pauseEmu();">Pause</button>
     <button class="button-black button-outline button-small black" onclick="wpcInterface.resumeEmu();">Resume</button>
   </div>
