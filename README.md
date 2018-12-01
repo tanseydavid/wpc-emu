@@ -20,7 +20,7 @@ Reference: http://bcd.github.io/freewpc/The-WPC-Hardware.html#The-WPC-Hardware
 ## CPU/ASIC Board
 - Blanking (not sure if needed)
 - Diagnostics LED ✓
-- Watchdog (not sure if needed, no reboot in case of an error which make it easier to find bugs in the emu)
+- Watchdog (needed for proper bootup sequence)
 - Bit Shifter ✓
 - Memory Protection ✓
 - Time of Day Clock ✓
