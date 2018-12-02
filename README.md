@@ -267,7 +267,7 @@ I found an analyse of the boot up sequence here: https://gist.github.com/74hc595
 dasm09: M6809/H6309/OS9 disassembler V0.1 2000 Arto Salmi
 ; org $8C9A
 RESET:
-8C9A: 1A 50          ORCC #$50      ;disable interrupts
+8C9A: 1A 50          ORCC #$50      ;disable interrupts (FIRQ & IRQ)
 8C9C: 86 00          LDA #$00
 8C9E: B7 3F F2       STA $3FF2      ;diagnostic LED off
 8CA1: 10 8E 00 06    LDY #$0006
@@ -332,10 +332,10 @@ L2:
 ; then writes 0xAA to 0x0000-0x172F and verifies again
 8D12: C6 06          LDB #$06
 8D14: 86 B4          LDA #$B4
-8D16: B7 3F FD       STA $3FFD      ;unlock protected memory with magic value 0xB4
+8D16: B7 3F FD       STA $3FFD      ;unlock protected memory with magic value 0xB4 (WPC_RAM_LOCK)
 8D19: 86 01          LDA #$01
-8D1B: B7 3F FE       STA $3FFE      ;something something memory protection
-8D1E: B7 3F FD       STA $3FFD
+8D1B: B7 3F FE       STA $3FFE      ;something something memory protection (WPC_RAM_LOCKSIZE)
+8D1E: B7 3F FD       STA $3FFD      ;write WPC_RAM_LOCK
 8D21: 86 55          LDA #$55       ;initialize A with 0x55
 
 8D23: 8E 00 00       LDX #$0000     ;initialize X pointer to start of RAM
@@ -344,7 +344,7 @@ L3:
 8D28: A7 01          STA 1,X
 8D2A: A7 02          STA 2,X
 8D2C: A7 03          STA 3,X
-8D2E: F7 3F FF       STB $3FFF      ;pet watchdog
+8D2E: F7 3F FF       STB $3FFF      ;pet watchdog WPC_ZEROCROSS_IRQ_CLEAR
 8D31: 30 04          LEAX 4,X       ;advance X by 4 bytes
 8D33: 8C 17 30       CMPX #$1730    ;stop at 0x1730 (start of persistent values?)
 8D36: 25 EE          BCS L3 ;$8D26
@@ -359,7 +359,7 @@ L4:
 8D45: 26 19          BNE $8D60
 8D47: A1 03          CMPA 3,X
 8D49: 26 15          BNE $8D60
-8D4B: F7 3F FF       STB $3FFF      ;pet watchdog
+8D4B: F7 3F FF       STB $3FFF      ;pet watchdog (WPC_ZEROCROSS_IRQ_CLEAR)
 8D4E: 30 04          LEAX 4,X       ;advance X by 4 bytes
 8D50: 8C 17 30       CMPX #$1730    ;stop at 0x1730
 8D53: 25 E6          BCS L4 ;$8D3B
@@ -385,7 +385,7 @@ L4:
 8D71: 8E FF FF       LDX #$FFFF     ;initialize delay counter
 8D74: 86 06          LDA #$06
 DELAY1:
-8D76: B7 3F FF       STA $3FFF      ;pet watchdog
+8D76: B7 3F FF       STA $3FFF      ;pet watchdog (WPC_ZEROCROSS_IRQ_CLEAR)
 8D79: 30 01          LEAX 1,X       ;waste some cycles
 8D7B: 30 1F          LEAX -1,X
 8D7D: 30 1F          LEAX -1,X
@@ -395,7 +395,7 @@ DELAY1:
 8D86: 8E FF FF       LDX #$FFFF     ;initialize delay counter
 8D89: 86 06          LDA #$06
 DELAY2:
-8D8B: B7 3F FF       STA $3FFF      ;pet watchdog
+8D8B: B7 3F FF       STA $3FFF      ;pet watchdog (WPC_ZEROCROSS_IRQ_CLEAR)
 8D8E: 30 01          LEAX 1,X       ;waste some cycles
 8D90: 30 1F          LEAX -1,X
 8D92: 30 1F          LEAX -1,X
@@ -409,7 +409,7 @@ DELAY2:
 DELAY3:
 8D9D: 8E C0 00       LDX #$C000     ;delay loop
 DELAY4:
-8DA0: B7 3F FF       STA $3FFF      ;pet watchdog
+8DA0: B7 3F FF       STA $3FFF      ;pet watchdog (WPC_ZEROCROSS_IRQ_CLEAR)
 8DA3: B7 3F DD       STA $3FDD      ;sound board something? (WPC_SOUND_CONTROL_STATUS)
 8DA6: 30 1F          LEAX -1,X
 8DA8: 26 F6          BNE DELAY4     ;$8DA0
@@ -422,7 +422,7 @@ DELAY4:
 ; ROM and RAM tests have passed
 ; System should boot correctly if we get here
 PASSED:
-8DB3: 1A 50          ORCC #$50      ;disable interrupts
+8DB3: 1A 50          ORCC #$50      ;disable interrupts (FIRQ & IRQ)
 8DB5: 10 CE 04 00    LDS #$0400     ;initialize stack pointer
 8DB9: BD 92 F5       JSR $92F5
 8DBC: F7 17 4D       STB $174D
@@ -432,7 +432,7 @@ PASSED:
 8DC8: 7F 17 4B       CLR $174B
 8DCB: 7F 17 4C       CLR $174C
 8DCE: 20 0E          BRA $8DDE
-8DD0: 1A 50          ORCC #$50      ;disable interrupts
+8DD0: 1A 50          ORCC #$50      ;disable interrupts (FIRQ & IRQ)
 8DD2: 86 01          LDA #$01
 8DD4: B7 17 4C       STA $174C
 8DD7: 10 CE 04 00    LDS #$0400
@@ -441,11 +441,14 @@ PASSED:
 8DE2: 4F             CLRA
 8DE3: 1F 8B          TFR A,DP
 8DE5: 8E 00 00       LDX #$0000
+
+; loop.. delay?
 8DE8: 6F 80          CLR ,X+
 8DEA: 86 06          LDA #$06
 8DEC: B7 3F FF       STA $3FFF      ;write to WPC_ZEROCROSS_IRQ_CLEAR
 8DEF: 8C 17 30       CMPX #$1730
 8DF2: 25 F4          BCS $8DE8
+
 8DF4: BD 91 C0       JSR $91C0
 8DF7: BD 9E E5       JSR $9EE5
 8DFA: BE 17 48       LDX $1748
@@ -463,7 +466,7 @@ PASSED:
 8E15: BD 89 04       JSR $8904
 8E18: 55             Invalid
 ```
-I guess there is one error, the comment "loop forever, watchdog will reset machine":
+I guess there is one error, the comment `loop forever, watchdog will reset machine`:
 - it's not the watchdog that will reset the machine but an interrupt call
 
 ## Gameplay
