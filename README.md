@@ -18,15 +18,15 @@ Reference: http://bcd.github.io/freewpc/The-WPC-Hardware.html#The-WPC-Hardware
 - emulate 6809 CPU ✓
 
 ## CPU/ASIC Board
-- Blanking (not sure if needed)
+- Blanking ✗ (not sure if needed)
 - Diagnostics LED ✓
-- Watchdog (needed for proper bootup sequence)
+- Watchdog ✗ (needed for proper bootup sequence)
 - Bit Shifter ✓
 - Memory Protection ✓
 - Time of Day Clock ✓
-- High Resolution Timer (not used, was used by alphanumeric games to do display dimming)
+- High Resolution Timer ✗ (not used, was used by alphanumeric games to do display dimming)
 - ROM Bank Switching ✓
-- RAM Bank Switching (WPC 95 only, not sure if needed, MAME does not implement it)
+- RAM Bank Switching ✗ (WPC 95 only, not sure if needed, MAME does not implement it)
 - The Switch Matrix ✓
 - External I/O ✓ (except sound)
 - Fliptronic Flipper ✓
@@ -40,17 +40,17 @@ Reference: http://bcd.github.io/freewpc/The-WPC-Hardware.html#The-WPC-Hardware
 - Solenoid Circuits ✓ (fade out timing missing)
 - General Illumination Circuits (Triac) ✓ (fade out timing missing)
 - Zero Cross Circuit ✓
-- support Fliptronics flipper
+- support Fliptronics flipper ½
 
 ## Sound Board
 - load pre DCS sound ROM files ✓
-- load DCS sound ROM files
+- load DCS sound ROM files ✗
 - Bank Switching ✓
-- Resample audio to 44.1khz
+- Resample audio to 44.1khz ½
 - emulate 6809 CPU ✓
-- emulate YM2151 FM Generator
-- emulate HC-55536 CVSD (speech synth)
-- emulate MC6821 PIA
+- emulate YM2151 FM Generator ½
+- emulate HC-55536 CVSD ✗ (speech synth)
+- emulate MC6821 PIA ✓
 - emulate DAC ✓
 
 ## Dot Matrix Controller Board
@@ -249,7 +249,7 @@ Known RAM positions for WPC games
 | 0x1807        | Date, checksum hi |
 | 0x1808        | Date, checksum lo |
 
-Note: The initial memory check writes from offset 0x0000 - 0x1730, so stored NVRAM data might be stored above this position.
+Note: The initial memory check writes from offset 0x0000 - 0x1730, so stored NVRAM data might be stored above 0x1730.
 
 ## Boot sequence:
 
@@ -451,8 +451,8 @@ PASSED:
 
 8DF4: BD 91 C0       JSR $91C0
 8DF7: BD 9E E5       JSR $9EE5
-8DFA: BE 17 48       LDX $1748
-8DFD: 8C 1A BC       CMPX #$1ABC
+8DFA: BE 17 48       LDX $1748      ;check against memory position 0x1748
+8DFD: 8C 1A BC       CMPX #$1ABC    
 8E00: 27 1B          BEQ $8E1D
 8E02: B6 17 4C       LDA $174C
 8E05: 27 08          BEQ $8E0F
