@@ -10,6 +10,7 @@ import { AudioOutput } from './lib/sound';
 import * as gamelist from './db/gamelist';
 import { populateControlUiView } from './ui/control-ui';
 import * as emuDebugUi from './ui/emu-debug-ui';
+//import * as emuDebugUi from './ui/ram-state-ui';
 
 const TICKS = 2000000;
 const DESIRED_FPS = 58;
