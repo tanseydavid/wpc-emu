@@ -21,7 +21,7 @@ function updateCanvas(emuState, cpuState) {
   }
 
   uiElement.updateMainEmuView(emuState, cpuState);
-  
+
   if (emuState.asic.wpc.solenoidState) {
     canvasOverlay.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
     drawFlashlamps(emuState.asic.wpc.solenoidState, 800, 15);
@@ -65,14 +65,5 @@ function initialise(gameEntry) {
 
   // preload data
   const playfieldData = gameEntry.playfield;
-  let playfieldImage = null;
-  if (playfieldData) {
-    playfieldImage = new Image();
-    playfieldImage.onload = function() {
-      canvas.drawImage(playfieldImage, 800, YPOS_DMD_MAIN_VIEW);
-    };
-    playfieldImage.src = FETCHURL + playfieldData.image;
-  }
-
   uiElement = debugLayout(canvas, playfieldData);
 }

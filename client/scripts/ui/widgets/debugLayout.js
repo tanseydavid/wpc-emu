@@ -27,13 +27,25 @@ class DebugLayout {
       'rgb(255,128,0)',
       'rgb(255,198,0)',
     ];
-    this.uiLibrary = uiElementFactory(canvas, this.colorSet, optionalPlayfieldData);
     this.canvas = canvas;
     this.width = canvas.width;
     this.height = canvas.height;
+    if (optionalPlayfieldData) {
+      this.loadOptionalPlayfield(optionalPlayfieldData);
+    }
+    this.uiLibrary = uiElementFactory(canvas, this.colorSet, optionalPlayfieldData);
     this.videoRam = undefined;
     this.frame = 0;
     this.initCanvas();
+  }
+
+  loadOptionalPlayfield(playfieldData) {
+    const playfieldImage = new Image();
+    playfieldImage.onload = () => {
+      this.canvas.drawImage(playfieldImage, 800, YPOS_DMD_MAIN_VIEW);
+    };
+    console.log('FETCHURL',FETCHURL)
+    playfieldImage.src = FETCHURL + playfieldData.image;
   }
 
   initCanvas() {

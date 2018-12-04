@@ -41,7 +41,7 @@ class UiElements {
         }
         this.canvas.fillRect(x + offsetX, y + offsetY, 1, 1);
       }
-      if (offsetX++ >= width - 1) {
+      if (++offsetX === width) {
         offsetX = 0;
         offsetY++;
       }
@@ -65,8 +65,7 @@ class UiElements {
         this.canvas.fillRect(MARGIN + x + offsetX * SCALE_FACTOR, MARGIN + y + offsetY * SCALE_FACTOR,
           SCALE_FACTOR - MARGIN, SCALE_FACTOR - MARGIN);
       }
-      offsetX++;
-      if (offsetX === width) {
+      if (++offsetX === width) {
         offsetX = 0;
         offsetY++;
       }
@@ -90,7 +89,7 @@ class UiElements {
             this.canvas.fillRect(x + offsetX, y + offsetY, 1, 1);
           }
         }
-        if (offsetX++ === width) {
+        if (++offsetX === width) {
           offsetX = 0;
           offsetY++;
         }
