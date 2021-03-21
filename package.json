@@ -1,27 +1,33 @@
 {
   "name": "wpc-emu",
-  "version": "0.8.9",
+  "version": "0.36.7",
   "description": "WPC pinball machine emu",
+  "author": "Michael Vogt <michu@neophob.com>",
+  "homepage": "https://github.com/neophob/wpc-emu",
   "main": "index.js",
+  "types": "./types/index.d.ts",
   "engines": {
     "node": ">=10.0.0"
   },
-  "author": "Michael Vogt",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/neophob/wpc-emu"
+  },
   "license": "ISC",
   "devDependencies": {
-    "ava": "^0.25.0",
-    "copy-webpack-plugin": "^4.6.0",
-    "http-server": "^0.11.1",
-    "nyc": "^13.1.0",
+    "ava": "^3.13.0",
+    "copy-webpack-plugin": "^6.2.1",
+    "http-server": "^0.12.3",
+    "nyc": "^15.1.0",
     "remove-debug-loader": "^0.2.6",
-    "sinon": "^6.3.5",
-    "terser-webpack-plugin": "^1.1.0",
-    "webpack": "^4.27.1",
-    "webpack-cli": "^3.1.2",
-    "xo": "^0.23.0"
+    "sinon": "^9.2.0",
+    "terser-webpack-plugin": "^5.0.0",
+    "webpack": "^5.1.0",
+    "webpack-cli": "^4.0.0",
+    "xo": "^0.33.1"
   },
   "dependencies": {
-    "debug": "^4.1.0"
+    "debug": "^4.2.0"
   },
   "xo": {
     "envs": [
@@ -46,36 +52,43 @@
       "unicorn/import-index": 0,
       "new-cap": 0,
       "prefer-destructuring": 0,
-      "no-use-extend-native/no-use-extend-native": 0
+      "no-use-extend-native/no-use-extend-native": 0,
+      "padding-line-between-statements": 0,
+      "array-element-newline": 0
     },
     "ignores": [
       "client",
       "docs",
-      "lib/boards/up/ym2151.js",
-      "lib/boards/up/mc6809.js"
+      "test/tracer/disasm.js"
     ]
+  },
+  "ava": {
+    "files": [
+      "test/lib/**/*.test.js"
+    ],
+    "verbose": true
   },
   "scripts": {
     "build": "webpack --mode development",
     "watch": "webpack --mode development --watch",
     "build:production": "webpack --mode production",
-    "build:test": "rm -f dist/* && webpack && cp assets/* dist && DEBUG=* node index.js",
-    "start": "DEBUG=* node index.js",
-    "start:fileserv": "http-server ./dist -S -C assets/localhost-cert/server.crt -K assets/localhost-cert/server.key --cors -p 8080 || echo '\n\nERROR. Did you created and install the local dev certificates? Heres the content:' && cat assets/localhost-cert/README.md",
-    "debug": "node --inspect index.js",
+    "start": "DEBUG=* node example.js",
+    "start:fileserv": "cp -fr ./rom ./dist && npm run start:webserver",
+    "start:fileserv:prod": "cp -fr ./rom ./docs && npm run start:webserver",
+    "start:webserver": "http-server ./dist -S -C assets/localhost-cert/server.crt -K assets/localhost-cert/server.key --cors -p 8080 || echo '\n\nERROR. Did you created and install the local dev certificates? Heres the content:' && cat assets/localhost-cert/README.md",
+    "debug": "node --inspect example.js",
     "xo": "xo",
-    "test": "nyc ava --verbose test/lib/**",
+    "test": "nyc ava --verbose",
     "test:coverage": "nyc report --reporter=html",
-    "test:debug": "DEBUG='wpc*' ava --verbose test/lib/**",
-    "test:integration": "ava --verbose test/integration/*.test.js",
+    "test:debug": "DEBUG='wpc*' ava --fail-fast --verbose",
+    "test:integration": "ava --config integration.ava.cjs",
     "test:runner": "node test/headless-runner.js",
-    "test:soundboard": "env DEBUG='*' node test/integration/soundboard.js",
     "tracer:dump": "cd ./test/tracer && ./_runbig.sh",
-    "tracer:stats": "cd ./test/tracer && ./_runbig.sh stats",
+    "tracer:stats": "cd ./test/tracer && ./_runbig.sh stats > stats.txt",
     "tracer:status": "cd ./test/tracer/wpc-emu-dumps && git status",
     "tracer:diff": "cd ./test/tracer/wpc-emu-dumps && git diff",
     "benchmark": "node test/integration/benchmark.js > /dev/null",
     "benchmark:t2": "CYCLES=20000000 ROMFILE=./rom/t2_l8.rom node test/integration/benchmark.js > /dev/null",
-    "release": "rm -rf ./docs/* && rm -rf ./dist/* && npm run build:production && cd client && npm run build:production && cd .. && cp -rf dist/* docs"
+    "release": "./build/docker-wrapper.sh"
   }
 }

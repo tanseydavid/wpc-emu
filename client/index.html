@@ -4,30 +4,35 @@
     <meta charset="UTF-8">
     <title>WPC Emu Debug view</title>
     <meta name="viewport" content="viewport-fit=cover, initial-scale=1, user-scalable=yes, width=device-width">
-    <script src="wpc-emu.js"></script>
-    <style>
-      canvas { position: absolute; }
-      #rootNode { z-index: 1 }
-      #canvasOverlayNode { z-index: 2 }
-      html,
-      body {
-          width: 1025;
-          height: 100%;
-          margin: 5;
-      }
-      canvas {
-          width: 100%;
-          height: 560;
-      }
-
-    </style>
   </head>
   <body>
     <main class="wrapper">
+
       <div class="container">
+        <div class="row">
+          <div class="column column-10"></div>
+          <div class="column column-90">
+            <a class="red" href="https://www.concealed-art.com">CONCEALED ART - SUPPORT THIS PROJECT</a>
+          </div>
+        </div>
         <div id="rootNode"></div>
+      </div>
+
+      <div id="memoryMonitor" class="container" style="visibility: hidden; height: 0px;">
+        <div id="memoryNode"></div>
+        <!-- NOTE: it's a hack, memoryOverlayNode has the height set, memoryNode not. Used to properly align variable node -->
+        <div id="memoryOverlayNode"></div>
+        <div id="variableNode"></div>
+      </div>
+
+      <div class="container">
         <div id="canvasNode"></div>
         <div id="canvasOverlayNode"></div>
+        <div id="canvasDmdNode"></div>
+        <div id="canvasDmdMemNode"></div>
+        <div id="canvasMemNode"></div>
+        <div id="canvasLampNode"></div>
+        <div id="canvasFlashNode"></div>
       </div>
     </main>
   </body>

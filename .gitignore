@@ -1,8 +1,6 @@
 .DS_Store
 node_modules
 /dist
-test/dmdripper/imgOK
-test/dmdripper/img2
 npm-debug.log
 *.ROM
 *.PP
@@ -15,3 +13,12 @@ server.csr
 server.key
 server.crt
 ./rom
+assets/soundripper/tmp
+assets/soundripper/output.*
+.clinic
+docs/rom
+assets/soundripper
+assets/client-example/dist
+fuzz-errors.txt
+fuzz/out
+wpcemu-webworker-api.js

@@ -1,90 +1,83 @@
 'use strict';
 
+import { Howl, Howler } from 'howler';
+import { createSoundPlayer } from './sound-player';
+
 export { AudioOutput };
 
-function AudioOutput(AudioContext, sampleSize) {
-  return new Sound(AudioContext, sampleSize);
+function AudioOutput(audioData) {
+  return new Sound(audioData);
 }
 
-const DEFAULT_SAMPLE_SIZE = 1024 * 1;
-//at least the from DAC
-const INPUT_SAMPLE_RATE_HZ = 8000;
-const OUTPUT_SAMPLE_RATE_HZ = 44100;
-const PLAYBACK_RATE = INPUT_SAMPLE_RATE_HZ / OUTPUT_SAMPLE_RATE_HZ;
-const MONO = 1;
+const BONG_SOUND = [ FETCHURL + 'sound/boing.mp3' ];
+const NO_SOUND = {
+  url: [],
+  sample: {},
+  sprite: {},
+};
 
 class Sound {
 
-  constructor(AudioContext) {
-    this.audioCtx = new AudioContext();
-    this.gainNode = this.audioCtx.createGain();
+  constructor(audioData = NO_SOUND) {
+    Howler.unload();
 
-    // configure nodes
-    this.gainNode.gain.value = 0.9;
+    this.bong = new Howl({
+      volume: 1.0,
+      src: BONG_SOUND,
+    });
 
-    // connect nodes
-    this.gainNode.connect(this.audioCtx.destination);
+    this.player = createSoundPlayer(audioData);
+  }
 
-    try {
-      this._prepareAudio();
-      setInterval(() => {
-        this._fillAudioBuffer();
-      }, 50);
-    } catch(error) {
-      console.log('AUDIO_INIT_FAILED', error.message);
-      this.noAudio = true;
+  callback(message = {}) {
+    switch (message.command) {
+      case 'PLAYSAMPLE': {
+        this.player.playId(message.id);
+        break;
+      }
+      case 'MAINVOLUME': {
+        const volume = (message.value / 31);
+        this.setVolume(volume);
+        break;
+      }
+
+      case 'STOPSOUND':
+        this.player.stopAll();
+        break;
+
+      case 'CHANNELOFF':
+        console.log('CHANNELOFF_NOT_IMPLEMENTED YET', message.channel);
+        break;
+
+      default:
+        console.log('NOT_IMPLEMENTED YET', message.command);
+        break;
     }
   }
 
-  _prepareAudio() {
-    this.ym2151buffer = this.audioCtx.createBuffer(2, DEFAULT_SAMPLE_SIZE, OUTPUT_SAMPLE_RATE_HZ);
-    this.buffer = this.audioCtx.createBuffer(MONO, DEFAULT_SAMPLE_SIZE, INPUT_SAMPLE_RATE_HZ);
-    this.bufferData = this.buffer.getChannelData(0);
-    this.audioBuffer = this.audioCtx.createBufferSource();
-    this.audioBuffer.playbackRate.value = PLAYBACK_RATE;
-    //TODO is this leaking?
-    this.audioBuffer.connect(this.gainNode);
-    this.count = 0;
-  }
-
-  writeAudioData(value) {
-    if (this.noAudio) {
-      return;
-    }
-    if (this.count < DEFAULT_SAMPLE_SIZE) {
-      // fill buffer with values form -1.0 and 1.0
-      this.bufferData[this.count++] = (value - 64) / 64;
-    } else {
-      // set the buffer in the AudioBufferSourceNode
-      this.audioBuffer.buffer = this.buffer;
-//      console.log('sound output', this.audioBuffer.buffer.duration);
-
-      // start the source playing
-      this.audioBuffer.start();
-      //TODO need to do a clever buffer switch here
-      this._prepareAudio();
-    }
+  playBootSound() {
+    console.log('playbootsound');
+    this.bong.play();
   }
 
   setVolume(floatVolume) {
-    if (this.noAudio) {
-      return;
-    }
-    this.gainNode.gain.value = floatVolume;
-  }
-
-  _fillAudioBuffer() {
-//    this.mixStereoFunction(this.ym2151buffer, this.ym2151buffer.length, 0);
-//    console.log('bufr',this.ym2151buffer);
-  }
-
-  setMixStereoFunction(mixStereoFunction) {
-    this.mixStereoFunction = mixStereoFunction;
-//    console.log('XXXmixStereoFunction', this.mixStereoFunction);
+    console.log('SET MAINVOLUME', floatVolume);
+    Howler.volume(floatVolume);
   }
 
   stop() {
-    //audioSourceNode.disconnect()">
+    this.player.stopAll();
   }
 
+  pause() {
+    this.player.pause();
+  }
+
+  resume() {
+    this.player.resume();
+  }
+
+  getState() {
+    return this.player.soundState;
+  }
 }

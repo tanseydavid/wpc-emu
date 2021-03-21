@@ -1,7 +1,7 @@
-  'use strict';
+'use strict';
 
-const webpack = require('webpack');
 const path = require('path');
+const webpack = require('webpack');
 const TerserPlugin = require('terser-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { GenerateSW } = require('workbox-webpack-plugin');
@@ -25,6 +25,11 @@ module.exports = () => {
         template: 'index.html',
         minify: true
       }),
+      new webpack.DefinePlugin({
+        'global.RELEASE_VERSION': JSON.stringify(
+          require('./package.json').version
+        ),
+      }),
       new FaviconsWebpackPlugin(path.resolve('../assets/logo.png')),
       new GenerateSW({
         clientsClaim: true,
@@ -32,13 +37,13 @@ module.exports = () => {
         runtimeCaching: [
           {
             // cache assets and reuse them
-            urlPattern: /.*\/rom\/.*|.*\/foo-temp\/.*/,
+            urlPattern: /.*\/rom\/.*|.*\.woff2|.*\/sound\/.*|.*\/foo-temp\/.*/,
             handler: 'cacheFirst',
             options: {
               cacheName: 'assets',
               expiration: {
-                maxEntries: 16,
-                maxAgeSeconds: 3600 * 24 * 60,
+                maxEntries: 64,
+                maxAgeSeconds: 3600 * 24 * 90,
               },
             }
           },
@@ -49,8 +54,8 @@ module.exports = () => {
             options: {
               cacheName: 'application',
               expiration: {
-                maxEntries: 16,
-                maxAgeSeconds: 3600 * 24 * 7,
+                maxEntries: 32,
+                maxAgeSeconds: 1,
               },
             }
           },
@@ -94,7 +99,7 @@ module.exports = () => {
       })]
     },
     output: {
-      filename: 'wpc-client.js',
+      filename: '[name].js',
       path: path.resolve(__dirname, '../dist')
     },
     module: {
@@ -110,6 +115,10 @@ module.exports = () => {
         {
           test: /\.tpl/,
           use: 'raw-loader'
+        },
+        {
+          test: /\.worker\.js$/,
+          use: { loader: 'worker-loader' }
         }
       ]
     }

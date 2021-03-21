@@ -1,0 +1,57 @@
+name: WPC-Emu CI
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [12.x, 14.x]
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+
+    - name: Build WPC-Emu Library
+      run: |
+        npm ci
+        time npm run test
+
+    - name: Run WPC-Emu Integration tests
+      run: |
+        npm run test:integration
+
+    - name: Build WPC-Emu Client
+      run: |
+        cd client
+        npm ci
+        npm run test
+
+    - name: Build Gamelist
+      run: |
+        cd build/gamelist
+        npm ci
+        time npm run start
+        cat ../../GAMES.md
+
+    - name: Minimal Client example
+      run: |
+        cd assets/client-example
+        npm i
+        time npm run build:ci
+
+    - name: Build WPC-Emu Typescript definitions
+      run: |
+        cd types
+        npm ci
+        npm run lint
+        npm run test
+
+      env:
+        CI: true

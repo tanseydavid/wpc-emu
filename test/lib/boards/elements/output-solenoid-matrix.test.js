@@ -1,7 +1,7 @@
 'use strict';
 
-import test from 'ava';
-import SolenoidMatrix from '../../../../lib/boards/elements/output-solenoid-matrix';
+const test = require('ava');
+const SolenoidMatrix = require('../../../../lib/boards/elements/output-solenoid-matrix');
 
 const UPDATE_AFTER_TICKS = 8;
 
@@ -39,6 +39,15 @@ test('solenoidMatrix, update all generic solenoids', (t) => {
   t.is(solenoidMatrix.solenoidState[23], 0);
   t.is(solenoidMatrix.solenoidState[24], 0xFF);
   t.is(solenoidMatrix.solenoidState[31], 0xFF);
+});
+
+test('solenoidMatrix, update fliptronics solenoids', (t) => {
+  const solenoidMatrix = t.context;
+  solenoidMatrix.writeFliptronic(0xFF);
+  t.is(solenoidMatrix.solenoidState[31], 0);
+  t.is(solenoidMatrix.solenoidState[32], 0xFF);
+  t.is(solenoidMatrix.solenoidState[33], 0xFF);
+  t.is(solenoidMatrix.solenoidState[39], 0xFF);
 });
 
 test('solenoidMatrix, fail if value exceeds unsigned byte range', (t) => {

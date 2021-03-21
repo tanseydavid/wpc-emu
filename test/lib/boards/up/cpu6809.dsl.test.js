@@ -1,7 +1,7 @@
 'use strict';
 
-import test from 'ava';
-import Cpu6809 from '../../../../lib/boards/up/cpu6809';
+const test = require('ava');
+const Cpu6809 = require('../../../../lib/boards/up/cpu6809');
 
 /*jshint bitwise: false*/
 
@@ -367,6 +367,7 @@ Source: Description Of The Motorola 6809 Instruction Set by Paul D. Burgin
 const FLAG_CLEAR = '0';
 const FLAG_SET = '1';
 const FLAG_UNAFFECTED = '-';
+//TODO add missing flags d s c n
 
 //HNZVC
 const EXPECTED_FLAG_MAP = [
@@ -396,8 +397,8 @@ test.beforeEach((t) => {
 
 function flagCheckTest(t, testData) {
   const cpu = t.context.cpu;
-  cpu.set('flags', 0xFF);
   cpu.reset();
+  cpu.set('flags', 0xFF);
   cpu.step();
 
   for (var x = 0; x < testData.flags.length; x++) {
@@ -410,10 +411,11 @@ function flagCheckTest(t, testData) {
       case FLAG_SET:
         t.true((cpu.regCC & mask) > 0);
         break;
-      case FLAG_UNAFFECTED:
+      case FLAG_UNAFFECTED: {
         const unaffectedFlag = cpu.regCC & mask;
         t.true(unaffectedFlag > 0, 'offset: ' + x + ', ' + unaffectedFlag + ', mask: ' + mask);
         break;
+      }
       default:
         t.pass();
     }
@@ -469,8 +471,8 @@ marshall(PAGE1_OPS)
         testData.op & 0xFF, (testData.op >>> 8) & 0xFF, RESET_VECTOR_VALUE_LO, RESET_VECTOR_VALUE_HI
       ];
       const cpu = t.context.cpu;
-      cpu.set('flags', flags);
       cpu.reset();
+      cpu.set('flags', flags);
       cpu.step();
       t.is(expectedTickCount, cpu.tickCount - OP_0X10_OPCODE_CYCLE);
     }
@@ -510,8 +512,8 @@ marshall(PAGE2_OPS)
         testData.op & 0xFF, (testData.op >>> 8) & 0xFF, RESET_VECTOR_VALUE_LO, RESET_VECTOR_VALUE_HI
       ];
       const cpu = t.context.cpu;
-      cpu.set('flags', flags);
       cpu.reset();
+      cpu.set('flags', flags);
       cpu.step();
       t.is(testData.cycles, cpu.tickCount - OP_0X11_OPCODE_CYCLE);
     }
@@ -543,10 +545,10 @@ function marshall(instructions) {
       const junks = line.split('|');
       const op = junks[1].split('    ')[0].trim();
       return {
-        op: parseInt(op, 16),
+        op: Number.parseInt(op, 16),
         instruction: junks[2].trim(),
         addressMode: junks[3].trim(),
-        cycles: parseInt(junks[4], 10) + parseInt(junks[7] || '0', 10),
+        cycles: Number.parseInt(junks[4], 10) + Number.parseInt(junks[7] || '0', 10),
         flags: junks[6].trim(),
         desc: (junks[1] + junks[2] + junks[3]).trim(),
       };

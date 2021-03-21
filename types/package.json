@@ -1,0 +1,17 @@
+{
+  "name": "wpc-emu-ts",
+  "version": "1.1.0",
+  "description": "Typescript definition for WPC-Emu",
+  "main": "index.js",
+  "scripts": {
+    "lint": "dtslint .",
+    "test": "tsc wpcemu-webworker-api.ts && node wpcemu-webworker-api.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^12.12.47",
+    "dtslint": "^3.6.12",
+    "typescript": "^3.9.5"
+  }
+}

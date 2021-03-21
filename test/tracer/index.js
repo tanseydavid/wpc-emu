@@ -7,10 +7,16 @@ const Emulator = require('../../lib/emulator');
 const disasm = require('./disasm');
 
 const romU06Path = process.env.ROMFILE || path.join(__dirname, '/../../rom/HURCNL_2.ROM');
-const HAS_SECURITY_FEATURE = process.env.HAS_SECURITY_FEATURE === 'true' ? 'securityPic' : '';
+const HAS_SECURITY_FEATURE = process.env.HAS_SECURITY_FEATURE === 'true' ? ['securityPic', 'wpcSecure'] : [];
+const HAS_DCS_BOARD = process.env.HAS_DCS_BOARD === 'true' ? ['wpcDcs'] : [];
+const HAS_DMD_BOARD = process.env.HAS_DMD_BOARD === 'true' ? ['wpcDmd'] : [];
+const HAS_FLIPTRONICS_BOARD = process.env.HAS_FLIPTRONICS_BOARD === 'true' ? ['wpcFliptronics'] : [];
+
+const FEATURES = HAS_DCS_BOARD.concat(HAS_SECURITY_FEATURE).concat(HAS_DMD_BOARD).concat(HAS_FLIPTRONICS_BOARD);
+
 const MAXSTEPS = process.env.STEPS || 0xFF000;
 
-console.log('WPC-EMU tracer', { HAS_SECURITY_FEATURE, MAXSTEPS, ROMFILE: romU06Path });
+console.log('WPC-EMU tracer', { FEATURES, MAXSTEPS, ROMFILE: romU06Path });
 
 const MAX_LOOPS = 64;
 const lastPC = [MAX_LOOPS].fill(0xFF);
@@ -34,10 +40,8 @@ function startTrace() {
       };
       return Emulator.initVMwithRom(romData, {
         fileName: 'foo',
-        features: [
-          HAS_SECURITY_FEATURE,
-        ],
-        skipWmcRomCheck: false,
+        features: FEATURES,
+        skipWpcRomCheck: false,
       });
     })
     .then((wpcSystem) => {
@@ -49,9 +53,6 @@ function startTrace() {
       while (steps++ < MAXSTEPS) {
         wpcSystem.executeCycle(1, 1);
         const cpu = wpcSystem.cpuBoard.cpu;
-
-        //make sure next OP is correct
-        cpu.checkInterrupt();
 
         const pc = cpu.regPC;
         const i1 = cpu.memoryReadFunction(pc);
@@ -155,5 +156,5 @@ function setupFakeSystemTime() {
   sinon.useFakeTimers({
     now: 1483228800000,
   });
-  console.log('Fake system clock initialised:', new Date());
+  console.log('Fake system clock initialized:', new Date());
 }

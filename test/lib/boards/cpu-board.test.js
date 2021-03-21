@@ -1,13 +1,13 @@
 'use strict';
 
-import test from 'ava';
-import CpuBoard from '../../../lib/boards/cpu-board';
+const test = require('ava');
+const CpuBoard = require('../../../lib/boards/cpu-board');
 
 const PAGESIZE = 0x4000;
 const WPC_ROM_BANK = 0x3FFC;
 
 test.beforeEach((t) => {
-  const gameRom = new Uint8Array(0x18000);
+  const gameRom = new Uint8Array(0x18000).fill(0xFF);
   const initObject = {
     romObject: '',
     romSizeMBit: 1,
@@ -21,28 +21,44 @@ test.beforeEach((t) => {
 test('should get ui data', (t) => {
   const cpuBoard = t.context;
   cpuBoard.reset();
-  const result = cpuBoard.getUiState();
-  t.is(result.ticks, 0);
-  t.is(result.missedIrqCall, 0);
-  t.is(result.missedFirqCall, 0);
-  t.is(result.irqCount, 0);
-  t.is(result.firqCount, 0);
-  t.is(result.nmiCount, 0);
+  const result = cpuBoard.getState();
+  t.is(result.cpuState.tickCount, 0);
+  t.is(result.cpuState.missedIRQ, 0);
+  t.is(result.cpuState.missedFIRQ, 0);
+  t.is(result.cpuState.irqCount, 0);
+  t.is(result.cpuState.firqCount, 0);
+  t.is(result.cpuState.nmiCount, 0);
   t.is(result.protectedMemoryWriteAttempts, 0);
+  t.is(result.memoryWrites, 0);
+  t.is(result.version, 5);
 });
 
 test('should start cpu board', (t) => {
   const cpuBoard = t.context;
   cpuBoard.start();
-  const result = cpuBoard.getUiState();
-  t.is(result.ticks, 0);
+  const result = cpuBoard.getState();
+  t.is(result.cpuState.tickCount, 0);
+});
+
+test('should ignore empty setState', (t) => {
+  const cpuBoard = t.context;
+  cpuBoard.start();
+  const result = cpuBoard.setState();
+  t.is(result, false);
+});
+
+test('should ignore invalid version', (t) => {
+  const cpuBoard = t.context;
+  cpuBoard.start();
+  const result = cpuBoard.setState({ version: 1 });
+  t.is(result, false);
 });
 
 test('should change cabinet input', (t) => {
   const cpuBoard = t.context;
   cpuBoard.start();
   cpuBoard.setCabinetInput(1);
-  const state = cpuBoard.getUiState();
+  const state = cpuBoard.getState();
   const result = state.asic.wpc.inputState;
   t.is(result[0], 1);
 });
@@ -50,9 +66,9 @@ test('should change cabinet input', (t) => {
 test('should change switch input', (t) => {
   const cpuBoard = t.context;
   cpuBoard.start();
-  cpuBoard.setInput(11);
-  cpuBoard.setInput(13);
-  const state = cpuBoard.getUiState();
+  cpuBoard.setSwitchInput(11);
+  cpuBoard.setSwitchInput(13);
+  const state = cpuBoard.getState();
   const result = state.asic.wpc.inputState;
   t.is(result[1], 5);
 });
@@ -61,9 +77,17 @@ test('should change fliptronice input', (t) => {
   const cpuBoard = t.context;
   cpuBoard.start();
   cpuBoard.setFliptronicsInput('F1');
-  const state = cpuBoard.getUiState();
+  const state = cpuBoard.getState();
   const result = state.asic.wpc.inputState;
   t.is(result[9], 1);
+});
+
+test('should enable toggleMidnightMadnessMode', (t) => {
+  const cpuBoard = t.context;
+  cpuBoard.toggleMidnightMadnessMode();
+  const state = cpuBoard.getState();
+  const result = state.asic.wpc.time;
+  t.regex(result, /MM!$/);
 });
 
 test('should _bankswitchedRead, bank 0', (t) => {
@@ -93,23 +117,13 @@ test('should _bankswitchedRead, bank 5', (t) => {
   t.is(result, 12);
 });
 
-test('should _bankswitchedRead, bank 6 (systemrom)', (t) => {
+test('should _bankswitchedRead, bank 6 (systemrom, out of band)', (t) => {
   const BANK = 6;
   const cpuBoard = t.context;
   // this read wraps already
-  cpuBoard.systemRom[0] = 12;
   cpuBoard.asic.write(WPC_ROM_BANK, BANK);
   const result = cpuBoard._bankswitchedRead(0);
-  t.is(result, 12);
-});
-
-test('should _bankswitchedRead, bank 7 (systemrom)', (t) => {
-  const BANK = 7;
-  const cpuBoard = t.context;
-  cpuBoard.systemRom[PAGESIZE] = 12;
-  cpuBoard.asic.write(WPC_ROM_BANK, BANK);
-  const result = cpuBoard._bankswitchedRead(0);
-  t.is(result, 12);
+  t.is(result, 0);
 });
 
 test('should _bankswitchedRead, bank 8', (t) => {
@@ -121,11 +135,10 @@ test('should _bankswitchedRead, bank 8', (t) => {
   t.is(result, 12);
 });
 
-test('should _bankswitchedRead, bank 0xFF (systemrom)', (t) => {
-  const BANK = 0xFF;
+test('should mirror wpc asic calls in memory', (t) => {
+  const BANK = 6;
   const cpuBoard = t.context;
-  cpuBoard.systemRom[PAGESIZE] = 12;
   cpuBoard.asic.write(WPC_ROM_BANK, BANK);
-  const result = cpuBoard._bankswitchedRead(0);
-  t.is(result, 12);
+  const result = cpuBoard.ram[WPC_ROM_BANK];
+  t.is(result, BANK);
 });
