@@ -5,7 +5,7 @@ function pug_classes_object(r){var a="",n="";for(var o in r)o&&r[o]&&pug_has_own
 function pug_escape(e){var a=""+e,t=pug_match_html.exec(a);if(!t)return e;var r,c,n,s="";for(r=t.index,c=0;r<a.length;r++){switch(a.charCodeAt(r)){case 34:n="&quot;";break;case 38:n="&amp;";break;case 60:n="&lt;";break;case 62:n="&gt;";break;default:continue}c!==r&&(s+=a.substring(c,r)),c=r+1,s+=n}return c!==r?s+a.substring(c,r):s}
 var pug_has_own_property=Object.prototype.hasOwnProperty;
 var pug_match_html=/["&<>]/;function mruTemplate(locals) {var pug_html = "", pug_mixins = {}, pug_interp;;var locals_for_with = (locals || {});(function (mrulist) {pug_html = pug_html + "\u003Cdiv class=\"row\"\u003E\u003Cdiv class=\"column\"\u003E\u003Cspan id=\"mru\"\u003E\u003C\u002Fspan\u003E\u003Ch4\u003ERecent\u003Cul class=\"demo-list-two mdl-list mdc-list--two-line\"\u003E";
-if (mrulist === undefined) {
+if (mrulist === undefined || mrulist === null) {
 mrulist = []
 }
 // iterate mrulist

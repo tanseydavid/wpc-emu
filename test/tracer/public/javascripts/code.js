@@ -25,6 +25,7 @@ document.addEventListener("DOMContentLoaded", async function(){
     if (chartDiv) {
         apexHeatmap();
     }
+
     let heatmapCoverageAllBanksDiv = document.querySelector('#heatmap');
     if (heatmapCoverageAllBanksDiv) {
         apexHeatmapCoverageAllBanks( 350 );
@@ -167,21 +168,34 @@ mru = {};
 mru.RomFiles = [];
 mru.SetMostRecent = function( filename ) {
     this.Get();
-    let matchIndex = this.RomFiles.findIndex(x => x.filename === filename );
+    if (mru.RomFiles === undefined || mru.RomFiles === null) {
+        mru.RomFiles = [];
+        let fileObj = {};
+        fileObj.filename = filename;
+        fileObj.id = filename;
+        mru.RomFiles.push( filename );
+    }
+
+    let matchIndex = mru.RomFiles.findIndex(x => x.filename === filename );
     if (matchIndex){
-        let saveItem = this.RomFiles[ matchIndex ];
+        let saveItem = mru.RomFiles[ matchIndex ];
         this.Remove( matchIndex );
         this.RomFiles.unshift( saveItem );
         this.Save();
         this.RefreshUI();
+    } else {
+        let fileObj = {};
+        mru.RomFiles.push( filename );
+        mru.Save();
     }
 };
 mru.Save = function() {
-    localStorage.setItem('mruListRomFiles', JSON.stringify(this.RomFiles));
+    if (mru.RomFiles === undefined || mru.RomFiles === null) return;
+    localStorage.setItem('mruListRomFiles', JSON.stringify(mru.RomFiles));
 };
 mru.Get = function() {
     this.RomFiles = JSON.parse(localStorage.getItem("mruListRomFiles"));
-    localStorage.setItem('mruListRomFiles', JSON.stringify(this.RomFiles));
+    localStorage.setItem('mruListRomFiles', JSON.stringify(mru.RomFiles));
 };
 mru.Remove = function(index) {
     if (index >= 0 && index <this.RomFiles.length){
