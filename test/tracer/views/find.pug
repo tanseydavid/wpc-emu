@@ -1,0 +1,43 @@
+extends layout
+
+mixin findresultsheader(...result)
+  each val, key in result
+    each v, k in val
+      if (v.length > 0 && k != "search")
+        span= k
+          | , &nbsp;
+
+mixin findresults(...result)
+  each val, key in result
+    each v, k in val
+      if (v.length > 0 && k != "search")
+        each v1, k1 in v
+          tr
+            td= k
+            td=  '$' + d2h_16( v1.address )
+            td.mdl-data-table__cell--non-numeric
+              if ( v1.labelsNearby && v1.labelsNearby.length > 0)
+                each label, labelkey in v1.labelsNearby
+                  +addressChip( label.address, label.bankId, label.label )
+
+block content
+  div.row
+    div.column
+      h4 FIND $
+        =f.search
+      div
+        | found in region(s): &nbsp;
+        +findresultsheader( f )
+      br
+      br
+      table.mdl-data-table.mdl-js-data-table.mdl-shadow--2dp
+        thead
+          tr
+            th Region / Bank
+            th Address
+            th.mdl-data-table__cell--non-numeric Nearby labels
+        +findresults( f )
+        br
+    div.column
+      div.mdl-cell.mdl-cell--4-col
+        +bankLinksList( romstate.bankid_first, romstate.bankid_last )

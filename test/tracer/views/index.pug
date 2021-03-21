@@ -1,0 +1,26 @@
+extends layout
+
+block content
+  .mdl-grid
+
+    div.mdl-cell.mdl-cell--2-col
+      +leftColumn(romstate)
+
+    div.mdl-cell.mdl-cell--3-col
+        - var n = romstate.bankid_first;
+        - var p = romstate.bankid_last;
+        h5 ROM Banks
+        #heatmap
+        +bankLinksList( n, p )
+
+    div.mdl-cell.mdl-cell--4-col
+        h5 ROM Fixed region
+        +sysLinksList( )
+        br
+
+    div.mdl-cell.mdl-cell--2-col
+        .mdl-cell.mdl-cell--2-col.graybox
+        span#mrulist
+
+    div.mdl-cell.mdl-cell--4-col
+

@@ -1,0 +1,27 @@
+extends layout
+
+block content
+  .mdl-grid
+
+    .mdl-cell.mdl-cell--2-col
+      +leftColumn(romstate)
+
+    .mdl-cell.mdl-cell--8-col
+      +pageNavigation("HEX DUMP")
+      pre#dump= dumpresult
+
+    .mdl-cell.mdl-cell--2-col
+      div(style="padding-left: 5px;")
+        h6 Nearby Labels
+        p
+        if(navstate)
+          +labelsNearby( navstate.labelsNearby )
+        br
+        +navigationTabs()
+        br
+        br
+        button#show-dialog.mdl-button Show Dialog
+
+    dialog.mdl-dialog
+      include includes/dialogdasmlabel.pug
+

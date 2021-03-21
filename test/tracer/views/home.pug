@@ -1,0 +1,23 @@
+extends layout
+
+block content
+  .mdl-grid
+    .mdl-cell.mdl-cell--10-col
+      include:markdown-it homepage.md
+      .mdl-grid
+        .mdl-cell.mdl-cell--3-col
+          +splashCard( "ROM Management", "Automatically handles addressing and paging of ROM Banks and System ROM regions.  Jump to Bank Addresses using links on any Bank Address reference." )
+        .mdl-cell.mdl-cell--3-col
+          +splashCard( "Function Insights", "Automatic identification of WPC-style calling conventions (parameter-bytes encoded at point-of-call) and called functions" )
+        .mdl-cell.mdl-cell--3-col
+          +splashCard( "Smart Find", "Search for and find all locations that contains byte strings (both literal and skeleton) across entire ROM address space" )
+      .mdl-grid
+        .mdl-cell.mdl-cell--3-col
+          +splashCard( "Assembly Labels", "On-the-fly you can define  labels for addresses understood to be functions and/or data.  Initially default, derived label names are used but you can edit the Symbolic labels to reflect your growing understanding of the binary" )
+        .mdl-cell.mdl-cell--3-col
+          +splashCard( "Static Analysis", "Histogram of high-reference functions and addresses from both the SYSTEM region and the Banked ROM address space" )
+        .mdl-cell.mdl-cell--3-col
+          +splashCard( "Dynamic Analysis", "Soft-step function execution to reveal details of WPC-style calling conventions, associated parameters and dependent calls depth.r " )
+
+    .mdl-cell.mdl-cell--2-col
+      span#mrulist

@@ -6,13 +6,20 @@ const sinon = require('sinon');
 const Emulator = require('../../lib/emulator');
 const disasm = require('./disasm');
 
-const romU06Path = process.env.ROMFILE || path.join(__dirname, '/../../rom/HURCNL_2.ROM');
-const HAS_SECURITY_FEATURE = process.env.HAS_SECURITY_FEATURE === 'true' ? 'securityPic' : '';
+const romU06Path = process.env.ROMFILE || path.join(__dirname, '/../../rom/fb_g11.ROM');
+const HAS_SECURITY_FEATURE = process.env.HAS_SECURITY_FEATURE === 'true' ? ['securityPic', 'wpcSecure'] : [];
+const HAS_DCS_BOARD = process.env.HAS_DCS_BOARD === 'true' ? ['wpcDcs'] : [];
+const HAS_DMD_BOARD = process.env.HAS_DMD_BOARD === 'true' ? ['wpcDmd'] : [];
+const HAS_FLIPTRONICS_BOARD = process.env.HAS_FLIPTRONICS_BOARD === 'true' ? ['wpcFliptronics'] : [];
+
+const FEATURES = HAS_DCS_BOARD.concat(HAS_SECURITY_FEATURE).concat(HAS_DMD_BOARD).concat(HAS_FLIPTRONICS_BOARD);
+
 const MAXSTEPS = process.env.STEPS || 0xFF000;
 
-console.log('WPC-EMU tracer', { HAS_SECURITY_FEATURE, MAXSTEPS, ROMFILE: romU06Path });
+console.log('WPC-EMU tracer', { FEATURES, MAXSTEPS, ROMFILE: romU06Path });
 
-const MAX_LOOPS = 64;
+const MAX_LOOPS = 1024;
+// const MAX_LOOPS = 64;
 const lastPC = [MAX_LOOPS].fill(0xFF);
 let outputSlice = [];
 let traceLoops = 0;
@@ -21,6 +28,30 @@ function initTraceLoops() {
   outputSlice = [];
 }
 
+function writeTraceSlice(system) {
+
+  const cpu = system.cpuBoard.cpu;
+
+  const pc = cpu.regPC;
+  const i1 = cpu.memoryReadFunction(pc);
+  const i2 = cpu.memoryReadFunction(pc + 1);
+  const i3 = cpu.memoryReadFunction(pc + 2);
+  const i4 = cpu.memoryReadFunction(pc + 3);
+  const i5 = cpu.memoryReadFunction(pc + 4);
+
+  outputSlice.push({
+    pc,
+    i1, i2, i3, i4, i5,
+    cc: cpu.regCC,
+    a: cpu.regA,
+    b: cpu.regB,
+    x: cpu.regX,
+    y: cpu.regY,
+    s: cpu.regS,
+    u: cpu.regU
+  });
+
+}
 function startTrace() {
   const loadRomFilesPromise = Promise.all([
     loadFile(romU06Path),
@@ -33,11 +64,9 @@ function startTrace() {
         u06: romFiles[0],
       };
       return Emulator.initVMwithRom(romData, {
-        fileName: 'foo',
-        features: [
-          HAS_SECURITY_FEATURE,
-        ],
-        skipWmcRomCheck: false,
+        fileName: 'gw_pc',
+        features: FEATURES,
+        skipWpcRomCheck: false,
       });
     })
     .then((wpcSystem) => {
@@ -45,13 +74,16 @@ function startTrace() {
       wpcSystem.reset();
       wpcSystem.start();
 
+      // wpcSystem.executeCycle(100000, 32);
+      // wpcSystem.cpuState.regPC = 0x97d5;
+      // let cs = wpcSystem.cpuState;
+      // wpcSystem.cpuBoard.setState();
+      wpcSystem.cpuBoard.cpu.regPC = 0x97d5;
+
       let steps = 0;
       while (steps++ < MAXSTEPS) {
-        wpcSystem.executeCycle(1, 1);
-        const cpu = wpcSystem.cpuBoard.cpu;
 
-        //make sure next OP is correct
-        cpu.checkInterrupt();
+        const cpu = wpcSystem.cpuBoard.cpu;
 
         const pc = cpu.regPC;
         const i1 = cpu.memoryReadFunction(pc);
@@ -59,17 +91,50 @@ function startTrace() {
         const i3 = cpu.memoryReadFunction(pc + 2);
         const i4 = cpu.memoryReadFunction(pc + 3);
         const i5 = cpu.memoryReadFunction(pc + 4);
-        outputSlice.push({
-          pc,
-          i1, i2, i3, i4, i5,
-          cc: cpu.regCC,
-          a: cpu.regA,
-          b: cpu.regB,
-          x: cpu.regX,
-          y: cpu.regY,
-          s: cpu.regS,
-          u: cpu.regU
-        });
+
+        const instr = disasm.disasm(i1, i2, i3, i4, i5, pc);
+        const line = {
+            pc,
+            i1, i2, i3, i4, i5,
+            cc: cpu.regCC,
+            a: cpu.regA,
+            b: cpu.regB,
+            x: cpu.regX,
+            y: cpu.regY,
+            s: cpu.regS,
+            u: cpu.regU
+          };
+
+        printInstruction(pc, instr, line);
+
+        wpcSystem.cpuBoard.cpu.regPC += instr.bytes;
+
+        // outputSlice.push({
+        //   pc,
+        //   i1, i2, i3, i4, i5,
+        //   cc: cpu.regCC,
+        //   a: cpu.regA,
+        //   b: cpu.regB,
+        //   x: cpu.regX,
+        //   y: cpu.regY,
+        //   s: cpu.regS,
+        //   u: cpu.regU
+        // });
+
+        // outputSlice.push({
+        //   pc,
+        //   i1, i2, i3, i4, i5,
+        //   cc: cpu.regCC,
+        //   a: cpu.regA,
+        //   b: cpu.regB,
+        //   x: cpu.regX,
+        //   y: cpu.regY,
+        //   s: cpu.regS,
+        //   u: cpu.regU
+        // });
+        // writeTraceSlice(wpcSystem);
+
+
         if (steps % (MAX_LOOPS * 100) === 0) {
           flushTraces();
           initTraceLoops();
@@ -128,7 +193,7 @@ function printInstruction(pc, instr, line) {
   const U = 'U=' + formatRegister(line.u, 4);
   const REGS = CC + A + B + X + Y + S + U;
 
-  if (instr.params.length > 0) {
+  if (instr.params && instr.params.length > 0) {
     console.error(REGS + pc.toString(16).toUpperCase() + ': ' +
         instr.mnemo.padEnd(6) + instr.params
     );
@@ -155,5 +220,5 @@ function setupFakeSystemTime() {
   sinon.useFakeTimers({
     now: 1483228800000,
   });
-  console.log('Fake system clock initialised:', new Date());
+  console.log('Fake system clock initialized:', new Date());
 }

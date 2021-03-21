@@ -1,0 +1,175 @@
+mixin pageNavigation(pageTitle)
+  h4(style="margin-top: -10px")= pageTitle
+    a(href=`${navstate.linkPreviousDump}`)
+      -var classes = ['mdl-button', 'mdl-js-button', 'mdl-button--icon']
+      button(class=classes, data-mruindex=index)
+        i.material-icons skip_previous
+    a(href=`${navstate.linkNextDump}`)
+      -var classes = ['mdl-button', 'mdl-js-button', 'mdl-button--icon']
+      button(class=classes, data-mruindex=index)
+        i.material-icons skip_next
+    small
+      | $
+      =d2h_16(navstate.startAddress)
+      | &nbsp;-&nbsp;$
+      =d2h_16(navstate.endAddress)
+      | &nbsp;&nbsp;(Bank: $
+      =d2h(navstate.bankId)
+      | &nbsp;)
+
+mixin leftColumn(romstate)
+  img(width="180" src="https://www.ipdb.org/images/4023/image-1.jpg" style="padding-bottom: 15px")
+  +romDetails(romstate)
+  +labelsRegions()
+  button.mdl-button.mdl-js-button.mdl-js-ripple-effect(type="button" onclick="redirectToHeatmap()")
+    | Heatmap
+  button.mdl-button.mdl-js-button.mdl-js-ripple-effect(type="button" onclick="redirectToClear()")
+    | Clear
+
+mixin romDetails(romstate)
+  h4(style="margin-top: -10px")
+    =romstate.romname
+    small
+      sup
+        =romstate.gamename
+  p
+      =romstate.wpcversion
+  small
+      | SIZE:
+      =romstate.romsizekb
+      |  0x
+      =romstate.romsizehex
+      br
+      =romstate.bankcount
+      |  total ROM banks  ($
+      =romstate.bankid_first_hex
+      | -$
+      =romstate.bankid_last_hex
+      | )
+
+
+mixin bankLinksList(startingBankId, endingBankId, banksPerLine )
+  p
+    - var currentBankId = startingBankId;
+    - var b = banksPerLine ? banksPerLine : 8;
+    while currentBankId <= endingBankId
+        - var currentBankId_hex = currentBankId.toString(16).padStart( 2, '0');currentBankId++;
+        a(href='/dasm/$' + currentBankId_hex + '/$4000/$40ff', style="font-family: 'Courier New', monospace")
+            | $#{currentBankId_hex}
+        if ((currentBankId - startingBankId) % b == 0)
+            br
+        else
+            | &nbsp;&nbsp;
+        if ((currentBankId - startingBankId) % 16 == 0)
+          br
+
+
+mixin bankLinksListDump(startingBankId, endingBankId)
+    p
+        - var currentBankId = startingBankId;
+        while currentBankId <= endingBankId
+            - var currentBankId_hex = currentBankId.toString(16);currentBankId++;
+            a(href='/dump/$' + currentBankId_hex + '/$4000', style="font-family: 'Courier New', monospace")
+                | $#{currentBankId_hex}
+            if ((currentBankId - startingBankId) % 8 == 0)
+                br
+            else
+                | &nbsp;&nbsp;
+            if ((currentBankId - startingBankId) % 16 == 0)
+                br
+
+
+mixin sysLinksList()
+    each n, index in [0x8000, 0x9000, 0xa000, 0xb000, 0xc000, 0xd000, 0xe000, 0xf000]
+        - var fixedRegionAddress = n.toString(16).toUpperCase();n++;
+        span( style="font-family: 'Courier New', monospace")
+          a(href='/dasm/$20/$' + fixedRegionAddress + '/$' + (n+0x100).toString(16).toUpperCase())
+            | $
+            =fixedRegionAddress
+        | &nbsp;&nbsp;
+        if ((index+1) %  4 == 0)
+          br
+
+mixin hexBytesHeader()
+    each n, index in [0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f ]
+        - var hexOffset = '0' + n.toString(16).toUpperCase();n++;
+        a(href='/dasm/$20/$' + test + '/$' + (n + 0x100).toString(16).toUpperCase())
+            =hexOffset
+        | &nbsp;&nbsp;
+
+mixin labelsRegions()
+    h6 Regions
+        br
+        p
+        button.mdl-chip.mdl-chip--contact(type="button" onclick="redirectToLabelsRegion('RAM')")
+            span.mdl-chip__contact.mdl-color--teal.mdl-color-text--white(style="font-size: 11px")
+                | RAM
+            span.mdl-chip__text(style="font-size: 11px")
+                | #{labelRegions.labelsRegion.Ram.length}
+                | labels
+        br
+        p
+
+        button.mdl-chip.mdl-chip--contact(type="button" onclick="redirectToLabelsRegion('WPC')")
+            span.mdl-chip__contact.mdl-color--teal.mdl-color-text--white(style="font-size: 11px")
+                | WPC
+
+            span.mdl-chip__text(style="font-size: 11px")
+                | #{labelRegions.labelsRegion.Wpc.length}
+                | labels
+        br
+        p
+
+        button.mdl-chip.mdl-chip--contact(type="button" onclick="redirectToLabelsRegion('BANKS')")
+            span.mdl-chip__contact.mdl-color--teal.mdl-color-text--white(style="font-size: 11px")
+                | BANK
+
+            span.mdl-chip__text(style="font-size: 11px")
+                | #{labelRegions.labelsRegion.Banks.length}
+                | labels
+        br
+        p
+        button.mdl-chip.mdl-chip--contact(type="button" onclick="redirectToLabelsRegion('SYS')")
+            span.mdl-chip__contact.mdl-color--teal.mdl-color-text--white(style="font-size: 11px")
+                | SYS
+
+            span.mdl-chip__text(style="font-size: 11px")
+                | #{labelRegions.labelsRegion.Sys.length}
+                | labels
+
+mixin labelsNearby( labelsList )
+  if(labelsList && labelsList.length > 0)
+    each entry,key in labelsList
+      +addressChip(entry.address, entry.bankId, entry.label)
+      br
+
+mixin splashCard( title, description )
+  .demo-card-square.mdl-card.mdl-shadow--2dp
+      .mdl-card__title.mdl-card--expand
+          h2.mdl-card__title-text(style="color: grey")
+            =title
+      .mdl-card__supporting-text(style="height: 105px")
+          =description
+      .mdl-card__actions.mdl-card--border
+          a.mdl-button.mdl-button--colored.mdl-js-button.mdl-js-ripple-effect
+              View Learn More
+
+mixin addressChip( address, bankId, label )
+  div
+    button.mdl-chip.mdl-chip--contact( type="button" onclick="redirectToDasm(" + bankId + ", " + address + ")" )
+      span.mdl-chip__contact.mdl-color--teal.mdl-color-text--white(style="font-size: 11px !important")
+        | $#{d2h_16(address)}
+      span.mdl-chip__text(style="font-size: 12px !important")
+        | #{label}
+
+mixin navigationTabs()
+  .mdl-tabs.mdl-js-tabs.mdl-js-ripple-effect
+    .mdl-tabs__tab-bar
+      a.mdl-tabs__tab.is-active(href="#example-tab1-panel") Banks
+      a.mdl-tabs__tab(href="#example-tab2-panel") Fixed
+    .mdl-tabs__panel.is-active(id="example-tab1-panel")
+      h6 ROM Banks
+      +bankLinksList( romstate.bankid_first, romstate.bankid_last )
+    .mdl-tabs__panel(id="example-tab2-panel")
+      h6 ROM Fixed region
+      +sysLinksList( )

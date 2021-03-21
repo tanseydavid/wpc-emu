@@ -1,0 +1,15 @@
+{
+  "name": "gamelist",
+  "version": "1.0.0",
+  "description": "",
+  "main": "gamelist.js",
+  "scripts": {
+    "start": "node index.js 2> ../../GAMES.md",
+    "vpdb": "node vpdb-rom-check"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "node-fetch": "^2.6.0"
+  }
+}

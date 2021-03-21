@@ -2,7 +2,7 @@
 
 export { initialiseActions };
 
-function initialiseActions(initObject, wpcSystem) {
+function initialiseActions(initObject, webclient) {
   let initPromise = Promise.resolve();
   if (!initObject) {
     return initPromise;
@@ -12,9 +12,9 @@ function initialiseActions(initObject, wpcSystem) {
     initObject.closedSwitches.forEach((switchIdToEnable) => {
       console.log('INIT::enable switch', switchIdToEnable);
       if (switchIdToEnable[0] === 'F') {
-        wpcSystem.setFliptronicsInput(switchIdToEnable);
+        webclient.setFliptronicsInput(switchIdToEnable);
       } else {
-        wpcSystem.setInput(switchIdToEnable);
+        webclient.setSwitchInput(switchIdToEnable);
       }
     });
   }
@@ -27,10 +27,20 @@ function initialiseActions(initObject, wpcSystem) {
         })
         .then(() => {
           const source = initialAction.source;
-          if (source === 'cabinetInput') {
-            const keyValue = initialAction.value;
-            console.log('INIT::action - cabinet key', keyValue);
-            wpcSystem.setCabinetInput(keyValue);
+          switch (source) {
+            case 'cabinetInput':
+              const keyValue = initialAction.value;
+              console.log('INIT::action - cabinet key', keyValue);
+              return webclient.setCabinetInput(keyValue);
+
+            case 'writeMemory':
+              const offset = initialAction.offset;
+              const value = initialAction.value;
+              console.log('INIT::action - writeMemory', offset, value);
+              return wpcInterface.writeMemory(offset, value);
+
+            default:
+              console.warn('UNKNOWN_SOURCE', source);
           }
         });
     });

@@ -108,7 +108,7 @@ function extractDmdFrames(status) {
       .createHash('md5')
       .update(lowerHalfFrame)
       .digest('hex');
-/*    const checksum2 = crypto
+      /*const checksum2 = crypto
       .createHash('md5')
       .update(upperHalfFrame)
       .digest('hex');*/
@@ -156,7 +156,7 @@ function ripDmdFrames() {
       };
       return Emulator.initVMwithRom(romData, {
         fileName: 'foo',
-        skipWmcRomCheck: true,
+        skipWpcRomCheck: true,
         switchesEnabled,
       });
     })
@@ -185,9 +185,9 @@ function ripDmdFrames() {
             if (switchBlacklist.includes(input)) {
               input = 13;
             }
-            wpcSystem.setInput(input);
+            wpcSystem.setSwitchInput(input);
             wpcSystem.executeCycle(KEYPRESS_TICKS, CPU_STEPS);
-            wpcSystem.setInput(input);
+            wpcSystem.setSwitchInput(input);
           } catch (error) {}
         }
         extractDmdFrames(wpcSystem.getUiState());
@@ -211,9 +211,9 @@ function boot(wpcSystem) {
   wpcSystem.setCabinetInput(16);
   wpcSystem.executeCycle(HALF_SECOND_TICKS * 4, CPU_STEPS);
 
-  wpcSystem.setInput(13);
+  wpcSystem.setSwitchInput(13);
   wpcSystem.executeCycle(HALF_SECOND_TICKS, CPU_STEPS);
-  wpcSystem.setInput(13);
+  wpcSystem.setSwitchInput(13);
 
   wpcSystem.executeCycle(HALF_SECOND_TICKS, CPU_STEPS);
 
@@ -224,7 +224,7 @@ function boot(wpcSystem) {
   console.log('NAU');
   switchesEnabled.forEach((a) => {
     console.log('_',a);
-    wpcSystem.setInput(a);
+    wpcSystem.setSwitchInput(a);
     console.log('IS', wpcSystem.getUiState().asic.wpc.inputState);
 
   });

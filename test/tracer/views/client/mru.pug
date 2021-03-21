@@ -1,0 +1,63 @@
+div.row
+  div.column
+    span#mru
+    h4 Recent
+      ul.demo-list-two.mdl-list.mdc-list--two-line
+        if mrulist === undefined
+          - mrulist = []
+        each item,index in mrulist
+          li.mdl-list__item.mdl-list__item--two-line
+            -var newid = 'demo-menu-lower-right-' + index.toString()
+            span.mdl-list__item-primary-content
+              i.material-icons.mdl-list__item-avatar sd_storage
+              span
+                =item.id
+              span.mdl-list__item-sub-title
+                =item.filename
+            span.mdl-list__item-secondary-content
+              -var classes = ['mdl-button', 'mdl-js-button', 'mdl-button--icon']
+              button(class=classes, id=newid, data-filename=item.filename, data-mruindex=index)
+                i.material-icons more_vert
+
+          ul.mdl-menu.mdl-menu--bottom-right.mdl-js-menu.mdl-js-ripple-effect(for=newid)
+            li.mdl-menu__item Open
+            li.mdl-menu__item Open in new tab
+            li.mdl-menu__item.mdl-menu__item--full-bleed-divider Open in new window
+            li.mdl-menu__item Remove from Recent list
+    button.mdl-button.mdl-js-button.mdl-js-ripple-effect.dialog-button
+      | Choose a file
+
+dialog#dialog.mdl-dialog
+  h4.mdl-dialog__title
+    | Choose File
+  .mdl-dialog__content
+    p
+      | Choose a ROM file to examine.
+    ul.demo-list-two.mdl-list.mdc-list--two-line
+      if mrulist === undefined
+        - mrulist = []
+      each item,index in mrulist
+        li.mdl-list__item.mdl-list__item--two-line
+          -var newid = 'demo-menu-lower-right-' + index.toString()
+          span.mdl-list__item-primary-content
+            i.material-icons.mdl-list__item-avatar sd_storage
+            span
+              =item.id
+            span.mdl-list__item-sub-title
+              =item.filename
+          span.mdl-list__item-secondary-content
+            -var classes = ['mdl-button', 'mdl-js-button', 'mdl-button--icon']
+            button(class=classes, id=newid, data-filename=item.filename, data-mruindex=index)
+              i.material-icons more_vert
+
+        ul.mdl-menu.mdl-menu--bottom-right.mdl-js-menu.mdl-js-ripple-effect(for=newid)
+          li.mdl-menu__item Open
+          li.mdl-menu__item Open in new tab
+          li.mdl-menu__item.mdl-menu__item--full-bleed-divider Open in new window
+          li.mdl-menu__item Remove from Recent list
+
+  .mdl-dialog__actions
+    button(type="button").mdl-button
+      | Close
+    button(type="button" disabled="disabled").mdl-button
+      | Disabled action

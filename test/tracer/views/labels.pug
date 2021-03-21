@@ -1,0 +1,91 @@
+extends layout
+
+block content
+  .mdl-grid
+    div.mdl-cell.mdl-cell--2-col
+      +leftColumn(romstate)
+    div.mdl-cell.mdl-cell--6-col
+      h3
+        =(region) ? region.toUpperCase() : ''
+      h5 Labels
+        p
+        if (labelsForRegion)
+          table.mdl-data-table.mdl-js-data-table.mdl-shadow--2dp
+            thead
+              tr
+                th Address
+                th Region
+                th.mdl-data-table__cell--non-numeric Label
+                th.mdl-data-table__cell--non-numeric.mdl-table-header-no-sort Actions
+            tbody
+              if (labelsForRegion)
+                each entry,key in labelsForRegion
+                  tr
+                    td
+                      | $#{entry.address.toString(16)}
+                    td
+                      = (region === 'Banks' || region.startsWith('bank_') ) ? '$' + d2h( entry.bankId ) : region.toUpperCase()
+                    td.mdl-data-table__cell--non-numeric
+                      | #{entry.label}
+                    td
+                      // -var newid = 'btn_menu_' + key.toString()
+                      -var newid = 'btn_menu_' + entry.address.toString(16)
+                      -var classes = ['mdl-button', 'mdl-js-button', 'mdl-button--icon']
+                      button(class=classes, id=newid, data-labeladdress=entry.address.toString(16),  data-labelbankid=entry.bankId.toString(16) )
+                        i.material-icons more_vert
+
+                      ul.mdl-menu.mdl-menu--top-left.mdl-js-menu.mdl-js-ripple-effect(for=newid)
+                        li.mdl-menu__item Find all occurrences
+                        li.mdl-menu__item DASM
+                        li.mdl-menu__item HEX DUMP
+
+        if (labelsByBank)
+          each entry,key in labelsByBank.labelsBank
+            - var bankId = key.replace("bank_", "");
+            - var urlLabelRegion = "redirectToLabelsRegion( '$" + bankId + "' )";
+            button.mdl-chip.mdl-chip--contact(type="button" onclick=urlLabelRegion)
+              span.mdl-chip__contact.mdl-color--teal.mdl-color-text--white(style="font-size: 11px")
+                | $#{key.replace("bank_", "")}
+
+              span.mdl-chip__text(style="font-size: 11px")
+                | #{entry.length} labels &nbsp;
+            | &nbsp;
+
+
+          br
+    div.mdl-cell.mdl-cell--2-col
+      h5 Bank Labels
+        p
+        if (labelsByBank && labelsForRegion != null)
+          each entry,key in labelsByBank.labelsBank
+            - var bankId = key.replace("bank_", "");
+            - var urlLabelRegion = "redirectToLabelsRegion( '$" + bankId + "' )";
+            button.mdl-chip.mdl-chip--contact(type="button" onclick=urlLabelRegion)
+              span.mdl-chip__contact.mdl-color--teal.mdl-color-text--white(style="font-size: 11px")
+                | $#{key.replace("bank_", "")}
+
+              span.mdl-chip__text(style="font-size: 11px")
+                | #{entry.length} labels
+            br
+        p
+        if(navstate)
+          +labelsNearby( navstate.labelsNearby )
+
+
+  dialog.mdl-dialog
+    div.mdl-dialog__title Add/Edit Label
+    div.mdl-dialog__content
+      div#labeladdress.mdl-typography--subhead $40cc, $20
+      div.mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label
+          input(type="text" pattern="^[a-zA-Z0-9._-]+$")#j-labeltext.mdl-textfield__input
+          label(for="j-labeltext").mdl-textfield__label Label
+          span.mdl-textfield__error Letters, numbers and spaces only
+      div.mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label
+          input(type="text" pattern="[A-Z,a-z,0-9, ]*")#j-destination.mdl-textfield__input
+          label(for="j-destination").mdl-textfield__label Journey Destination
+          span.mdl-textfield__error Letters, numbers and spaces only
+
+      div.mdl-dialog__actions
+          button#dialog-rate_save.mdl-button.mdl-js-button.mdl-js-ripple-effect.mdl-button--colored.mdl-shadow--2dp Save
+          button#dialog-rate_clear.mdl-button Clear
+          button.mdl-button.close Close

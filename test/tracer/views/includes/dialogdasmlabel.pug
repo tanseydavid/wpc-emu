@@ -1,0 +1,14 @@
+h5 Add/Edit Label
+h4#labeladdress $40bb, $20
+div.mdl-dialog__content
+    div.mdl-textfield.mdl-js-textfield.mdl-textfield--floating-label
+        input(type="text" pattern="^[a-zA-Z0-9._-]+$")#j-labeltext.mdl-textfield__input
+        label(for="j-labeltext").mdl-textfield__label Label
+        span.mdl-textfield__error Letters, numbers and spaces only
+
+div.mdl-dialog__actions
+    button#dialog-rate_save.mdl-button.mdl-js-button.mdl-js-ripple-effect.mdl-button--colored.mdl-shadow--2dp Save
+    button#dialog-rate_clear.mdl-button Clear
+    button.mdl-button.close Close
+    p
+      =myTest

@@ -1,0 +1,41 @@
+include includes/mixins
+
+- let d2h = function(d){
+-   return (d / 256 + 1 / 512).toString(16).substring(2, 4);
+- }
+
+- let d2h_16 = function(d){
+-   if (d) {
+-     return d.toString(16).toUpperCase();
+-   }
+- }
+
+doctype html
+html(translate="no")
+  head
+    block head
+      block title
+        title= title
+      block meta
+        meta(name='description', content='')
+        meta(name='keywords', content='')
+        meta(name='viewport' content='width=device-width, initial-scale=1.0')
+      link(rel='stylesheet', href='/stylesheets/style.css')
+      link(rel='stylesheet', href='/stylesheets/material.min.css')
+      link(rel='stylesheet', href='https://fonts.googleapis.com/icon?family=Material+Icons')
+      if(romstate)
+        script.
+          currentBankId = #{romstate.currentbankid};
+      if(heatmap)
+        script.
+          var hm = !{JSON.stringify(heatmap)};
+
+  body
+    .mdl-layout.mdl-js-layout.mdl-layout--fixed-header
+      include header
+
+      main.mdl-layout__content
+        block content
+      include footer
+
+    include links

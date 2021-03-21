@@ -1,0 +1,49 @@
+extends layout
+
+mixin list(id, ...items)
+  ul(id=id)
+    each item in items
+      li= item
+
+block content
+  div.row
+    div.column
+    div.column
+      h3
+        =title
+        small
+          sup
+            =romstate.gamename
+      p
+        =romstate.wpcversion
+      small
+        | SIZE:
+        =romstate.romsizekb
+        |  0x
+        =romstate.romsizehex
+        br
+        =romstate.bankcount
+        |  total ROM banks  ($
+        =romstate.bankid_first_hex
+        | -$
+        =romstate.bankid_last_hex
+        | )
+      - var n = romstate.bankid_first;
+      - var p = romstate.bankid_last;
+      div.mdl-cell.mdl-cell--4-col
+        h4 Banked ROM
+        +bankLinksList( n, p )
+      br
+      div.mdl-cell.mdl-cell--4-col
+        h4 Fixed ROM
+        +sysLinksList( n, p )
+    div.column
+      h3
+
+
+  .mdl-layout.mdl-js-layout.mdl-layout--fixed-header
+    main.mdl-layout__content
+      .mdl-grid
+        .mdl-cell.mdl-cell--2-col.graybox
+          span#mrulist
+            | TEST

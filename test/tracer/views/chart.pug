@@ -1,0 +1,17 @@
+extends layout
+
+block content
+  .mdl-grid
+
+    .mdl-cell.mdl-cell--2-col
+      +leftColumn(romstate)
+
+    .mdl-cell.mdl-cell--6-col
+      #heatmap
+
+    .mdl-cell.mdl-cell--4-col
+      +bankLinksListDump( romstate.bankid_first, romstate.bankid_last )
+
+  dialog.mdl-dialog
+    include includes/dialogdasmlabel.pug
+

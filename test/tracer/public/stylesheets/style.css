@@ -1,0 +1,118 @@
+body {
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+  color: #00B7FF;
+}
+
+.row {
+  display: flex;
+}
+
+.column {
+  flex: 50%;
+}
+
+.menubox {
+  padding: 10px;
+}
+
+td
+{
+  padding:0 15px;
+}
+
+.mdl-layout__content {
+  padding: 10px;
+}
+
+.demo-card-square.mdl-card {
+  width: 300px;
+  height: 260px;
+}
+<!-- Wide card with share menu button -->
+ .demo-card-wide.mdl-card {
+   width: 512px;
+ }
+.demo-card-wide > .mdl-card__title {
+  color: #fff;
+  height: 176px;
+  background: url('../images/diecast-classic-car.jpg') center / cover;
+}
+.demo-card-wide-classic-cars > .mdl-card__title {
+  color: #fff;
+  height: 176px;
+  background: url('../images/diecast-classic-car.jpg') center / cover;
+}
+.demo-card-wide-ships > .mdl-card__title {
+  color: #fff;
+  height: 176px;
+  background: url('../images/diecast-ship.jpg') center / cover;
+}
+.demo-card-wide-planes > .mdl-card__title {
+  color: #fff;
+  height: 176px;
+  background: url('../images/diecast-plane.jpg') center / cover;
+}
+.demo-card-wide-motorcycles > .mdl-card__title {
+  color: #fff;
+  height: 176px;
+  background: url('../images/diecast-motorcycle.jpg') center / cover;
+}
+.demo-card-wide-vintage-cars > .mdl-card__title {
+  color: #fff;
+  height: 176px;
+  background: url('../images/diecast-vintage-car.jpg') center / cover;
+}
+.demo-card-wide-trucks-and-buses > .mdl-card__title {
+  color: #fff;
+  height: 176px;
+  background: url('../images/diecast-bus.jpg') center / cover;
+}
+.demo-card-wide-trains > .mdl-card__title {
+  color: #fff;
+  height: 176px;
+  background: url('../images/diecast-train.jpg') center / cover;
+}
+.demo-card-wide > .mdl-card__menu {
+  color: #fff;
+}
+.mdl-card__title-text {
+  color: #fff;
+}
+
+mdl-chip__text {
+  font-family: "monospace";
+  font-size: 12px;
+}
+
+mdl-chip__contact {
+  font-size: 12px;  !important
+}
+
+mdl-typography-styles-subtitle2 {
+  font-family: "Roboto";
+  font-size: 12px;
+}
+
+
+sup {
+  padding-left: 25px;
+}
+
+.monofont {
+  font-family: "monospace";
+  font-size: 14px;
+}
+
+pre {
+  height: auto;
+  max-height: 540px;
+  overflow: auto;
+  background-color: #f9f9f9;
+  word-break: normal !important;
+  word-wrap: normal !important;
+  white-space: pre !important;
+  padding: 5px;
+}​
